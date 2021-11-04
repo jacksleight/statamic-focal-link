@@ -4,7 +4,7 @@
 ![Packagist version](https://flat.badgen.net/packagist/v/jacksleight/statamic-link-fragment-fieldtype)
 ![License](https://flat.badgen.net/github/license/jacksleight/statamic-link-fragment-fieldtype)
 
-# Lazy Logo 
+# Statamic Link Fragment Fieldtype
 
 <!-- /statamic:hide -->
 
