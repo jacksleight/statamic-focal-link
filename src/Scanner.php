@@ -11,27 +11,24 @@ use Statamic\Facades\Entry;
 
 class Scanner
 {
-    protected $filter;
-
-    public function filter(callable $filter)
-    {
-        $this->filter = $filter;
-    }
-
     public function scan($link)
     {
-        $html = null;
+        $html  = null;
+        $rules = null;
+
+        $config = config("statamic.link-fragment-fieldtype");
 
         if (Str::startsWith($link, 'entry::')) {
-            $id = Str::after($link, 'entry::');
-            $html = $this->getEntryHtml($id);
-        } else if (Str::startsWith($link, 'http://')) {
-            $html = $this->getUrlHtml($link);
-        } else if (Str::startsWith($link, 'https://')) {
-            $html = $this->getUrlHtml($link);
+            $id    = Str::after($link, 'entry::');
+            $html  = $this->getEntryHtml($id);
+            $rules = $config['entry_rules'] ?? null;
+        } else if (Str::startsWith($link, 'http://') || Str::startsWith($link, 'https://')) {
+            $html  = $this->getUrlHtml($link);
+            $host  = parse_url($link)['host'];
+            $rules = $config["url_rules"][$host] ?? null;
         }
 
-        $fragments = $this->getFragments($html);
+        $fragments = $this->getFragments($html, $rules);
 
         return $fragments;
     }
@@ -59,7 +56,7 @@ class Scanner
         return $html ?? null;
     }
 
-    protected function getFragments($html)
+    protected function getFragments($html, $rules)
     {
         $toNull = fn ($value) => empty($value) ? null : $value;
 
@@ -72,21 +69,24 @@ class Scanner
 
         $xpath = new DOMXPath($dom);
 
-        $nodes = $xpath->query('//*[@id]');
+        $root = isset($rules['within'])
+            ? $dom->getElementById(Str::after($rules['within'], '#'))
+            : $dom->getElementsByTagName('body')->item(0);
+
+        $nodes = $xpath->query('.//*[@id]', $root);
         foreach ($nodes as $node) {
-            $id = $node->getAttribute('id');
-            $value = '#' . $id;
+            $value = '#' . $node->getAttribute('id');
             $title =
-                $toNull($node->getAttribute('data-fragment')) ??
+                $toNull($node->getAttribute('data-fragment-title')) ??
                 $toNull($node->getAttribute('title'));
             $display = $title
-                ? "{$title} — $value"
-                : "$value";
+                ? "{$value} — {$title}"
+                : "{$value}";
             $fragments->put($value, $display);
         }
 
-        if ($this->filter) {
-            $fragments = $fragments->filter($this->filter);
+        if (isset($rules['except'])) {
+            $fragments = $fragments->except($rules['except']);
         }
 
         return $fragments;

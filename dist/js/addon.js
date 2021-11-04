@@ -57,14 +57,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
   data: function data() {
     return {
       linkValue: this.meta.initialLink,
       fragmentValue: this.meta.initialFragment,
-      fragmentOptions: {}
+      fragmentOptions: {},
+      loading: false
     };
   },
   computed: {
@@ -75,10 +75,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       };
     },
     showFragmentField: function showFragmentField() {
-      return this.linkValue && (this.linkValue.substr(0, 7) === 'entry::' || this.linkValue.substr(0, 7) === 'http://' || this.linkValue.substr(0, 8) === 'https://');
+      return this.linkValue && (this.linkValue.substr(0, 7) === 'entry::' || this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrl || this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrl);
     },
     fragmentConfig: function fragmentConfig() {
       return _objectSpread(_objectSpread({}, this.meta.fragment.config), {}, {
+        placeholder: this.loading ? 'Looking for fragments…' : '#fragment',
         options: this.fragmentOptions
       });
     }
@@ -100,13 +101,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     fetchFragments: function fetchFragments() {
       var _this = this;
 
+      var cache = window.StatamicLinkFragmentFieldtype.cache;
+      var link = this.linkValue;
+
+      if (cache[link]) {
+        this.fragmentOptions = cache[link];
+        return;
+      }
+
+      this.loading = true;
       this.$axios.get(cp_url('fieldtypes/link_fragment/fragments'), {
         params: {
-          link: this.linkValue
+          link: link
         }
       }).then(function (response) {
         _this.fragmentOptions = response.data;
-      })["catch"](function (e) {});
+        cache[link] = response.data;
+      })["catch"](function (e) {
+        _this.fragmentOptions = {};
+      })["finally"](function (e) {
+        _this.loading = false;
+      });
     }
   }
 });
@@ -229,7 +244,6 @@ var render = function () {
                   ref: "fragment",
                   attrs: {
                     handle: "fragment",
-                    placeholder: "#fragment",
                     value: _vm.fragmentValue,
                     config: _vm.fragmentConfig,
                     meta: _vm.meta.fragment.meta,
@@ -435,6 +449,9 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Fieldtypes_LinkFragment_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Fieldtypes/LinkFragment.vue */ "./resources/js/components/Fieldtypes/LinkFragment.vue");
 
+window.StatamicLinkFragmentFieldtype = {
+  cache: {}
+};
 Statamic.booting(function () {
   Statamic.$components.register('link_fragment-fieldtype', _components_Fieldtypes_LinkFragment_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
 });

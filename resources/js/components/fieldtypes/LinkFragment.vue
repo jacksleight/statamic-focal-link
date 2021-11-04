@@ -22,7 +22,6 @@
                 <select-fieldtype
                     ref="fragment"
                     handle="fragment"
-                    placeholder="#fragment"
                     :value="fragmentValue"
                     :config="fragmentConfig"
                     :meta="meta.fragment.meta"
@@ -49,6 +48,7 @@ export default {
             linkValue: this.meta.initialLink,
             fragmentValue: this.meta.initialFragment,
             fragmentOptions: {},
+            loading: false,
         }
 
     },
@@ -64,15 +64,16 @@ export default {
 
         showFragmentField() {
             return this.linkValue && (
-                this.linkValue.substr(0, 7) === 'entry::' ||
-                this.linkValue.substr(0, 7) === 'http://' ||
-                this.linkValue.substr(0, 8) === 'https://'
+                (this.linkValue.substr(0, 7) === 'entry::') ||
+                (this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrl) ||
+                (this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrl)
             );
         },
 
         fragmentConfig() {            
             return {
                 ...this.meta.fragment.config,
+                placeholder: this.loading ? 'Looking for fragments…' : '#fragment',
                 options: this.fragmentOptions,
             };
         }
@@ -98,12 +99,22 @@ export default {
         },
 
         fetchFragments() {
+            const { cache } = window.StatamicLinkFragmentFieldtype;
+            const link = this.linkValue;
+            if (cache[link]) {
+                this.fragmentOptions = cache[link];
+                return;
+            }
+            this.loading = true;
             this.$axios.get(cp_url('fieldtypes/link_fragment/fragments'), {
-                params: { link: this.linkValue },
+                params: { link },
             }).then(response => {
                 this.fragmentOptions = response.data;
+                cache[link] = response.data;
             }).catch(e => {
-                
+                this.fragmentOptions = {};
+            }).finally(e => {
+                this.loading = false;
             })
         },
 

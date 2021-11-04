@@ -22,12 +22,17 @@ class ServiceProvider extends AddonServiceProvider
     {
         parent::register();
 
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/statamic/link-fragment-fieldtype.php', 'statamic.link-fragment-fieldtype',
+        );
     }
 
     public function boot()
     {
         parent::boot();
 
-        
+        $this->publishes([
+            __DIR__ . '/../config/statamic/link-fragment-fieldtype.php' => config_path('statamic/link-fragment-fieldtype.php'),
+        ], 'statamic-link-fragment-fieldtype-config');
     }
 }
