@@ -65,8 +65,8 @@ export default {
         showFragmentField() {
             return this.linkValue && (
                 (this.linkValue.substr(0, 7) === 'entry::') ||
-                (this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrl) ||
-                (this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrl)
+                (this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrls) ||
+                (this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrls)
             );
         },
 

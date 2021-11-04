@@ -29,7 +29,7 @@ class LinkFragment extends Fieldtype
                 'type' => 'collections',
                 'mode' => 'select',
             ],
-            'scan_url' => [
+            'scan_urls' => [
                 'display' => __('Scan URLs'),
                 'instructions' => __('Whether URLs should be scanned for fragments'),
                 'type' => 'toggle',
@@ -65,7 +65,7 @@ class LinkFragment extends Fieldtype
         return [
             'initialLink' => $value['link'],
             'initialFragment' => $value['fragment'],
-            'scanUrl' => $this->config('scan_url'),
+            'scanUrls' => $this->config('scan_urls'),
             'link' => [
                 'config' => $linkFieldtype->config(),
                 'meta' => $linkFieldtype->preload(),

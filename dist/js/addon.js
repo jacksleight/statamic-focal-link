@@ -75,7 +75,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       };
     },
     showFragmentField: function showFragmentField() {
-      return this.linkValue && (this.linkValue.substr(0, 7) === 'entry::' || this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrl || this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrl);
+      return this.linkValue && (this.linkValue.substr(0, 7) === 'entry::' || this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrls || this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrls);
     },
     fragmentConfig: function fragmentConfig() {
       return _objectSpread(_objectSpread({}, this.meta.fragment.config), {}, {
