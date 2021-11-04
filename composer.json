@@ -1,0 +1,22 @@
+{
+    "name": "jacksleight/statamic-link-fragment-fieldtype",
+    "autoload": {
+        "psr-4": {
+            "JackSleight\\StatamicLinkFragmentFieldtype\\": "src"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Statamic Link Fragment Fieldtype",
+            "description": "Statamic Link Fragment Fieldtype addon"
+        },
+        "laravel": {
+            "providers": [
+                "JackSleight\\StatamicLinkFragmentFieldtype\\ServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "statamic/cms": "^3.2"
+    }
+}
