@@ -46,7 +46,7 @@ This is telling the scanner to only look within the `#content` element and to ex
 ## Fieldtype Options
 
 * **collections:** The collections that should be linkable
-* **Scan URLs:** Whether to enable scanning of URLs (off by default)
+* **scan_urls:** Whether to enable scanning of URLs (off by default)
 
 ## Compatibility
 
