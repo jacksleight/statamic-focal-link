@@ -8,7 +8,7 @@
 
 <!-- /statamic:hide -->
 
-This Statamic addon allows you to link to entry and external page fragment IDs by selecting from an automatically populated list or inputting a custom value.
+This Statamic addon allows you to link to page fragment IDs by selecting from an automatically populated list or inputting a custom value.
 
 ## Installation
 
@@ -28,7 +28,7 @@ php please vendor:publish --tag=statamic-link-fragment-fieldtype-config
 
 Then open `config/statamic/link-fragment-fieldtype.php`.
 
-You can define rules for entries and external URLs per-host, for example:
+You can define rules for entry pages and URL pages per-host, for example:
 
 ```php
 'url_rules' => [
