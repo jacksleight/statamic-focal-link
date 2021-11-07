@@ -4,7 +4,7 @@
 ![Packagist version](https://flat.badgen.net/packagist/v/jacksleight/statamic-focal-link)
 ![License](https://flat.badgen.net/github/license/jacksleight/statamic-focal-link)
 
-# Focal Link 
+# Statamic Link Fragment Fieldtype
 
 <!-- /statamic:hide -->
 
