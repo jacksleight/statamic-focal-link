@@ -2,6 +2,7 @@
 
 namespace JackSleight\StatamicLinkFragmentFieldtype\Fieldtypes;
 
+use Str;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Field;
 use Facades\Statamic\Routing\ResolveRedirect;
@@ -29,26 +30,28 @@ class LinkFragment extends Fieldtype
                 'type' => 'collections',
                 'mode' => 'select',
             ],
-            'scan_urls' => [
-                'display' => __('Scan URLs'),
-                'instructions' => __('Whether URLs should be scanned for fragments'),
-                'type' => 'toggle',
-            ],
         ];
     }
 
     public function augment($value)
     {
-        $value = $this->normalizeValue($value);
+        list(
+            $linkValue,
+            $queryValue,
+            $fragmentValue,
+        ) = $this->parseValue($value);
 
-        $redirect = ResolveRedirect::resolve($value['link'], $this->field->parent());
+        $redirect = ResolveRedirect::resolve($linkValue, $this->field->parent());
 
         if ($redirect === 404) {
             return null;
         }
 
-        if (isset($value['fragment'])) {
-            $redirect .= $value['fragment'];
+        if (isset($queryValue)) {
+            $redirect .= "?{$queryValue}";
+        }
+        if (isset($fragmentValue)) {
+            $redirect .= "#{$fragmentValue}";
         }
 
         return $redirect;
@@ -56,19 +59,29 @@ class LinkFragment extends Fieldtype
 
     public function preload()
     {
-        $value = $this->normalizeValue($this->field->value());
+        $value = $this->field->value();
 
-        $linkFieldtype = $this->nestedLinkFieldtype($value['link']);
+        list(
+            $linkValue,
+            $queryValue,
+            $fragmentValue,
+        ) = $this->parseValue($value);
 
-        $fragmentFieldtype = $this->nestedFragmentFieldtype($value['fragment']);
+        $linkFieldtype     = $this->nestedLinkFieldtype($linkValue);
+        $queryFieldtype    = $this->nestedQueryFieldtype($queryValue);
+        $fragmentFieldtype = $this->nestedFragmentFieldtype($fragmentValue);
 
         return [
-            'initialLink' => $value['link'],
-            'initialFragment' => $value['fragment'],
-            'scanUrls' => $this->config('scan_urls'),
+            'initialLink' => $linkValue,
+            'initialQuery' => $queryValue,
+            'initialFragment' => $fragmentValue,
             'link' => [
                 'config' => $linkFieldtype->config(),
                 'meta' => $linkFieldtype->preload(),
+            ],
+            'query' => [
+                'config' => $queryFieldtype->config(),
+                'meta' => $queryFieldtype->preload(),
             ],
             'fragment' => [
                 'config' => $fragmentFieldtype->config(),
@@ -77,7 +90,7 @@ class LinkFragment extends Fieldtype
         ];
     }
 
-    private function nestedLinkFieldtype($value): Fieldtype
+    protected function nestedLinkFieldtype($value): Fieldtype
     {
         $linkField = (new Field('link', [
             'type' => 'link',
@@ -93,7 +106,19 @@ class LinkFragment extends Fieldtype
         return $linkField->fieldtype();
     }
 
-    private function nestedFragmentFieldtype($value): Fieldtype
+    protected function nestedQueryFieldtype($value): Fieldtype
+    {
+        $queryField = (new Field('fragment', [
+            'type' => 'select',
+            'taggable' => true,
+        ]));
+
+        $queryField->setValue($value);
+
+        return $queryField->fieldtype();
+    }
+
+    protected function nestedFragmentFieldtype($value): Fieldtype
     {
         $fragmentField = (new Field('fragment', [
             'type' => 'select',
@@ -105,17 +130,32 @@ class LinkFragment extends Fieldtype
         return $fragmentField->fieldtype();
     }
 
-    private function normalizeValue($value)
+    protected function parseValue($value)
     {
-        if (!is_array($value)) {
-            $value = [
-                'link'     => $value,
-                'fragment' => null,
-            ];
+        $linkValue     = null;
+        $queryValue    = null;
+        $fragmentValue = null;
+
+        if (isset($value)) {
+
+            $url = parse_url($value);
+            
+            if (isset($url['query'])) {
+                $linkValue = Str::before($value, '?');
+            } else if (isset($url['fragment'])) {
+                $linkValue = Str::before($value, '#');
+            } else {
+                $linkValue = $value;
+            }
+            $queryValue    = $url['query'] ?? null;
+            $fragmentValue = $url['fragment'] ?? null;
+            
         }
-        return $value + [
-            'link'     => null,
-            'fragment' => null,
+        
+        return [
+            $linkValue,
+            $queryValue,
+            $fragmentValue,
         ];
     }
 }

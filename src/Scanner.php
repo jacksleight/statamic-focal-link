@@ -20,20 +20,20 @@ class Scanner
 
         if (Str::startsWith($link, 'entry::')) {
             $id    = Str::after($link, 'entry::');
-            $html  = $this->getEntryHtml($id);
+            $html  = $this->fetchEntryHtml($id);
             $rules = $config['entry_rules'] ?? null;
         } else if (Str::startsWith($link, 'http://') || Str::startsWith($link, 'https://')) {
-            $html  = $this->getUrlHtml($link);
+            $html  = $this->fetchUrlHtml($link);
             $host  = parse_url($link)['host'];
             $rules = $config["url_rules"][$host] ?? null;
         }
 
-        $fragments = $this->getFragments($html, $rules);
+        $fragments = $this->findFragments($html, $rules);
 
         return $fragments;
     }
 
-    protected function getEntryHtml($id)
+    protected function fetchEntryHtml($id)
     {
         $entry = Entry::find($id);
 
@@ -49,14 +49,14 @@ class Scanner
         return $html;
     }
 
-    protected function getUrlHtml($url)
+    protected function fetchUrlHtml($url)
     {
         $html = @file_get_contents($url);
 
         return $html ?? null;
     }
 
-    protected function getFragments($html, $rules)
+    protected function findFragments($html, $rules)
     {
         $toNull = fn ($value) => empty($value) ? null : $value;
 

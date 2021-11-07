@@ -8,7 +8,7 @@
     "extra": {
         "statamic": {
             "name": "Statamic Link Fragment Fieldtype",
-            "description": "This Statamic addon allows you to link to entry and external page fragment IDs by selecting from an automatically populated list or inputting a custom value."
+            "description": "This Statamic fieldtype simplifies linking to entry and URL fragment identifiers and query strings. It supports automatic ID discovery, common format templates, predefined options and manual input."
         },
         "laravel": {
             "providers": [
