@@ -1,7 +1,8 @@
 import LinkFragment from './components/Fieldtypes/LinkFragment.vue';
 
 window.StatamicLinkFragmentFieldtype = {
-    cache: {},
+    specCache: {},
+    discoverCache: {},
 };
 
 Statamic.booting(() => {

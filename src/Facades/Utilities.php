@@ -4,10 +4,10 @@ namespace JackSleight\StatamicLinkFragmentFieldtype\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class Spec extends Facade
+class Utilities extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \JackSleight\StatamicLinkFragmentFieldtype\SpecRepository::class;
+        return \JackSleight\StatamicLinkFragmentFieldtype\Utilities::class;
     }
 }

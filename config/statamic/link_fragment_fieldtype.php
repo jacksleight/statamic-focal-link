@@ -4,44 +4,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Entries
+    | Link Variants
     |--------------------------------------------------------------------------
     |
-    | Config used for entries, keyed by collection handle.
+    | Configuration for different link variants.
     |
     */
 
-    'entries' => [
-        
-        // 'pages' => [
-        //     'queries' => [
-        //         'options'   => [],
-        //         'templates' => [],
-        //     ],
-        //     'fragments' => [
-        //         'options'   => [],
-        //         'templates' => [],
-        //         'discover'  => true,
-        //         'within'    => null,
-        //         'except'    => [],
-        //     ],
-        // ],
+    // Entry Links
 
+    'entry:*' => [
+        'queries' => false,
+        'fragments' => [
+            ':~:text=?&potato' => 'Text Fragment',
+        ],
+        'discover' => [
+            'labels' => [
+                'content' => true,
+            ],
+        ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | URLs
-    |--------------------------------------------------------------------------
-    |
-    | Config used URLs, keyed by domain/host name.
-    |
-    */
+    // URL Links
 
-    'urls' => [
-
-        // 'example.com' => [],
-
+    'url:*' => [
+        'fragments' => [
+            ':~:text={{}}' => 'Text Fragment',
+        ],
     ],
 
 ];

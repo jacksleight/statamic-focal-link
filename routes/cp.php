@@ -1,4 +1,3 @@
 <?php
 
-Route::get('fieldtypes/link_fragment/spec', 'CP\Controller@spec');
-Route::get('fieldtypes/link_fragment/discover', 'CP\Controller@discover');
+Route::get('fieldtypes/focal_link/spec', 'CP\Controller@spec');

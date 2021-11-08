@@ -5,30 +5,38 @@ namespace JackSleight\StatamicLinkFragmentFieldtype\Http\Controllers\CP;
 use Str;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
+use JackSleight\StatamicLinkFragmentFieldtype\Facades\Utilities;
 use JackSleight\StatamicLinkFragmentFieldtype\Facades\Scanner;
-use JackSleight\StatamicLinkFragmentFieldtype\Facades\Spec;
-use Statamic\Facades\Entry;
 
 class Controller extends CpController
 {
     public function spec(Request $request)
     {
-        $link = $request->link;
+        $value    = $request->value;
+        $discover = $request->discover === 'true';
 
-        if (Str::startsWith($link, 'entry::')) {
-            $id   = Str::after($link, 'entry::');
-            $type = 'entries';
-            $name = Entry::find($id)->collection()->handle();
-        } else if (Str::startsWith($link, 'http://') || Str::startsWith($link, 'https://')) {
-            $type = 'urls';
-            $name = parse_url($link)['host'];
+        list(
+            $linkValue
+        ) = Utilities::parseValue($value);
+
+        list(
+            $linkType,
+            $linkVariant,
+            $linkId,
+        ) = Utilities::parseLink($linkValue);
+
+        $linkSpec = Utilities::getSpec($linkType, $linkVariant);
+
+        if ($discover && $linkSpec && $linkSpec['discover'] !== false) {
+            if ($linkSpec['fragments'] !== false) {
+                $linkSpec['fragments'] = array_merge(
+                    $linkSpec['fragments'],
+                    Scanner::scan($linkType, $linkId, $linkSpec['discover'])
+                );
+            }
+            $linkSpec['discovered'] = true;
         }
 
-        return Spec::get($type, $name);
-    }
-
-    public function discover(Request $request)
-    {
-        return Scanner::scan($request->link);
+        return $linkSpec;
     }
 }

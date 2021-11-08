@@ -4,7 +4,7 @@ namespace JackSleight\StatamicLinkFragmentFieldtype;
 
 use Statamic\Providers\AddonServiceProvider;
 use JackSleight\StatamicLinkFragmentFieldtype\Scanner;
-use JackSleight\StatamicLinkFragmentFieldtype\SpecRepository;
+use JackSleight\StatamicLinkFragmentFieldtype\Utilities;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -25,11 +25,14 @@ class ServiceProvider extends AddonServiceProvider
         parent::register();
 
         $this->mergeConfigFrom(
+            __DIR__ . '/../config/statamic/presets.php', 'statamic.link_fragment_fieldtype',
+        );
+        $this->mergeConfigFrom(
             __DIR__ . '/../config/statamic/link_fragment_fieldtype.php', 'statamic.link_fragment_fieldtype',
         );
 
-        $this->app->singleton(SpecRepository::class, function () {
-            return new SpecRepository(config('statamic.link_fragment_fieldtype'));
+        $this->app->singleton(Utilities::class, function () {
+            return new Utilities();
         });
         $this->app->singleton(Scanner::class, function () {
             return new Scanner();

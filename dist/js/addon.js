@@ -12,12 +12,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+//
+//
+//
+//
 //
 //
 //
@@ -103,48 +113,45 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   mixins: [Fieldtype],
   data: function data() {
     return {
+      linkSpec: this.meta.linkSpec,
       linkValue: this.meta.initialLink,
       queryValue: this.meta.initialQuery,
       fragmentValue: this.meta.initialFragment,
       queryTemplate: null,
       fragmentTemplate: null,
-      linkSpec: null,
       loading: false
     };
   },
   computed: {
     returnValue: function returnValue() {
-      var value = this.linkValue;
-
-      if (this.queryValue !== null) {
-        value += "?".concat(this.queryValue);
+      if (!this.linkValue) {
+        return null;
       }
 
-      if (this.fragmentValue !== null) {
-        value += "#".concat(this.fragmentValue);
+      if (this.queryValue) {
+        value.search = "?".concat(this.queryValue);
       }
 
-      return value;
-    },
-    showQueryField: function showQueryField() {
-      return true;
-      return this.linkValue && (this.linkValue.substr(0, 7) === 'entry::' || this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrls || this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrls);
-    },
-    showFragmentField: function showFragmentField() {
-      return true;
-      return this.linkValue && (this.linkValue.substr(0, 7) === 'entry::' || this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrls || this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrls);
+      if (this.fragmentValue) {
+        value.hash = "#".concat(this.fragmentValue);
+      }
+
+      console.log(value);
+      return value.toString();
     },
     queryConfig: function queryConfig() {
-      return _objectSpread(_objectSpread({}, this.meta.fragment.config), {}, {
-        placeholder: this.loading ? 'Loading' : 'query',
-        options: this.linkSpec ? _objectSpread(_objectSpread({}, this.linkSpec.queries.templates), this.linkSpec.queries.options) : {}
-      });
+      return {
+        taggable: true,
+        placeholder: this.loading ? '◉ loading…' : 'query',
+        options: this.queryEnabled() ? this.formatOptions(this.linkSpec.queries) : {}
+      };
     },
     fragmentConfig: function fragmentConfig() {
-      return _objectSpread(_objectSpread({}, this.meta.fragment.config), {}, {
-        placeholder: this.loading ? 'Loading' : 'fragment',
-        options: this.linkSpec ? _objectSpread(_objectSpread({}, this.linkSpec.fragments.templates), this.linkSpec.fragments.options) : {}
-      });
+      return {
+        taggable: true,
+        placeholder: this.loading ? '◉ loading…' : 'fragment',
+        options: this.fragmentEnabled() ? this.formatOptions(this.linkSpec.fragments) : {}
+      };
     }
   },
   methods: {
@@ -156,33 +163,78 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.fragmentTemplate = null;
       this.linkSpec = null;
       this.update(this.returnValue);
-      this.fetchSpec();
+      this.linkChangedDebounced();
     },
-    queryChanged: function queryChanged(query) {
+    linkChangedDebounced: _.debounce(function () {
       var _this = this;
 
-      if (this.linkSpec && this.linkSpec.queries.templates[query]) {
-        this.queryTemplate = query;
-        this.$nextTick(function () {
-          _this.$refs.query_template.$refs.input.focus();
-        });
+      if (this.linkValue) {
+        var url = new URL(this.linkValue);
+
+        if (url.search.length) {
+          this.queryValue = url.search.substr(1);
+        }
+
+        if (url.hash.length) {
+          this.fragmentValue = url.hash.substr(1);
+        }
+      }
+
+      this.$nextTick(function () {
+        return _this.fetchLinkSpec();
+      });
+    }, 300),
+    queryChanged: function queryChanged(query) {
+      var prepared = this.prepareTemplate('query', query);
+
+      if (prepared) {
+        var _prepared = _slicedToArray(prepared, 2),
+            preparedValue = _prepared[0],
+            onNextTick = _prepared[1];
+
+        this.queryTemplate = preparedValue;
+        this.$nextTick(onNextTick);
       } else {
         this.queryValue = query;
         this.update(this.returnValue);
       }
     },
     fragmentChanged: function fragmentChanged(fragment) {
-      var _this2 = this;
+      var prepared = this.prepareTemplate('fragment', fragment);
 
-      if (this.linkSpec && this.linkSpec.fragments.templates[fragment]) {
-        this.fragmentTemplate = fragment;
-        this.$nextTick(function () {
-          _this2.$refs.fragment_template.$refs.input.focus();
-        });
+      if (prepared) {
+        var _prepared2 = _slicedToArray(prepared, 2),
+            preparedValue = _prepared2[0],
+            onNextTick = _prepared2[1];
+
+        this.fragmentTemplate = preparedValue;
+        this.$nextTick(onNextTick);
       } else {
         this.fragmentValue = fragment;
         this.update(this.returnValue);
       }
+    },
+    isTemplate: function isTemplate(template) {
+      var placeholder = '?';
+      return (template ? template.indexOf(placeholder) : -1) !== -1;
+    },
+    prepareTemplate: function prepareTemplate(type, template) {
+      var _this2 = this;
+
+      var placeholder = '?';
+      var index = template ? template.indexOf(placeholder) : -1;
+
+      if (index === -1) {
+        return;
+      }
+
+      var value = template.substr(0, index) + template.substr(index + placeholder.length);
+      return [value, function () {
+        var el = _this2.$refs["".concat(type, "_template")].$refs.input;
+
+        el.focus();
+        el.setSelectionRange(index, index);
+      }];
     },
     queryTemplateCommit: function queryTemplateCommit() {
       if (!this.queryTemplate) {
@@ -202,44 +254,71 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.fragmentTemplate = null;
       this.update(this.returnValue);
     },
-    queryFocus: function queryFocus() {
-      if (!this.linkSpec) {
-        this.fetchSpec();
+    inputFocus: function inputFocus() {
+      if (this.linkSpecPending()) {
+        this.fetchLinkSpec(true);
       }
     },
-    fragmentFocus: function fragmentFocus() {
-      if (!this.linkSpec) {
-        this.fetchSpec();
-      }
-    },
-    fetchSpec: function fetchSpec() {
+    fetchLinkSpec: function fetchLinkSpec() {
       var _this3 = this;
 
-      var cache = window.StatamicLinkFragmentFieldtype.cache;
-      var link = this.linkValue;
+      var discover = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var _window$StatamicLinkF = window.StatamicLinkFragmentFieldtype,
+          specCache = _window$StatamicLinkF.specCache,
+          discoverCache = _window$StatamicLinkF.discoverCache;
+      var cache = discover ? discoverCache : specCache;
+      var value = this.linkValue;
 
-      if (link === null) {
+      if (value === null) {
         return;
       }
 
-      if (cache[link]) {
-        this.linkSpec = cache[link];
+      if (cache[value]) {
+        this.linkSpec = cache[value];
         return;
       }
 
       this.loading = true;
-      this.$axios.get(cp_url('fieldtypes/link_fragment/spec'), {
+      this.$axios.get(cp_url('fieldtypes/focal_link/spec'), {
         params: {
-          link: link
+          value: value,
+          discover: discover
         }
       }).then(function (response) {
         _this3.linkSpec = response.data;
-        cache[link] = _this3.linkSpec;
+        cache[value] = _this3.linkSpec;
       })["catch"](function (e) {
         _this3.linkSpec = null;
       })["finally"](function (e) {
         _this3.loading = false;
       });
+    },
+    queryEnabled: function queryEnabled() {
+      return this.linkSpec && this.linkSpec.queries !== false;
+    },
+    fragmentEnabled: function fragmentEnabled() {
+      return this.linkSpec && this.linkSpec.fragments !== false;
+    },
+    linkSpecPending: function linkSpecPending() {
+      return !this.linkSpec || this.linkSpec.discover !== false && this.linkSpec.discovered === false;
+    },
+    formatOptions: function formatOptions(options) {
+      var _this4 = this;
+
+      return Object.fromEntries(Object.entries(options).map(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            value = _ref2[0],
+            label = _ref2[1];
+
+        label = label !== value ? "".concat(value, " \u2014 ").concat(label) : label;
+
+        if (_this4.isTemplate(value)) {
+          label = "".concat(label, "\u2026");
+        }
+
+        label = label.length > 80 ? "".concat(label.substr(0, 80), "\u2026") : label;
+        return [value, label];
+      }));
     }
   }
 });
@@ -769,13 +848,13 @@ var render = function () {
         },
       }),
       _vm._v(" "),
-      _vm.showFragmentField
-        ? _c("div", { staticClass: "mt-1 flex items-center" }, [
-            _c("div", { staticClass: "w-40 mr-2" }, [_vm._v(" ")]),
-            _vm._v(" "),
-            _c(
+      _c("div", { staticClass: "mt-1 space-x-1 flex items-center" }, [
+        _c("div", { staticClass: "w-40 mr-1 flex-shrink-0 text-right" }),
+        _vm._v(" "),
+        _vm.queryEnabled()
+          ? _c(
               "div",
-              { staticClass: "sfl-input flex-1 mr-1 flex items-center" },
+              { staticClass: "sfl-input flex-1 flex items-center" },
               [
                 _c("div", { staticClass: "sfl-prefix text-grey-60" }, [
                   _vm._v("?"),
@@ -789,15 +868,8 @@ var render = function () {
                         handle: "query",
                         value: _vm.queryValue,
                         config: _vm.queryConfig,
-                        meta: _vm.meta.query.meta,
                       },
-                      on: {
-                        focus: _vm.queryFocus,
-                        input: _vm.queryChanged,
-                        "meta-updated": function ($event) {
-                          _vm.meta.query.meta = $event
-                        },
-                      },
+                      on: { focus: _vm.inputFocus, input: _vm.queryChanged },
                     })
                   : _vm._e(),
                 _vm._v(" "),
@@ -805,7 +877,7 @@ var render = function () {
                   ? _c("text-input", {
                       ref: "query_template",
                       staticClass: "flex-1",
-                      attrs: { handle: "query_template" },
+                      attrs: { handle: "query_template", append: "⏎" },
                       on: {
                         keydown: function ($event) {
                           if (
@@ -835,9 +907,11 @@ var render = function () {
                   : _vm._e(),
               ],
               1
-            ),
-            _vm._v(" "),
-            _c(
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.fragmentEnabled()
+          ? _c(
               "div",
               { staticClass: "sfl-input flex-1 flex items-center" },
               [
@@ -853,15 +927,8 @@ var render = function () {
                         handle: "fragment",
                         value: _vm.fragmentValue,
                         config: _vm.fragmentConfig,
-                        meta: _vm.meta.fragment.meta,
                       },
-                      on: {
-                        focus: _vm.fragmentFocus,
-                        input: _vm.fragmentChanged,
-                        "meta-updated": function ($event) {
-                          _vm.meta.fragment.meta = $event
-                        },
-                      },
+                      on: { focus: _vm.inputFocus, input: _vm.fragmentChanged },
                     })
                   : _vm._e(),
                 _vm._v(" "),
@@ -869,7 +936,7 @@ var render = function () {
                   ? _c("text-input", {
                       ref: "fragment_template",
                       staticClass: "flex-1",
-                      attrs: { handle: "fragment_template" },
+                      attrs: { handle: "fragment_template", append: "⏎" },
                       on: {
                         keydown: function ($event) {
                           if (
@@ -902,9 +969,9 @@ var render = function () {
                   : _vm._e(),
               ],
               1
-            ),
-          ])
-        : _vm._e(),
+            )
+          : _vm._e(),
+      ]),
     ],
     1
   )
@@ -1106,7 +1173,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Fieldtypes_LinkFragment_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Fieldtypes/LinkFragment.vue */ "./resources/js/components/Fieldtypes/LinkFragment.vue");
 
 window.StatamicLinkFragmentFieldtype = {
-  cache: {}
+  specCache: {},
+  discoverCache: {}
 };
 Statamic.booting(function () {
   Statamic.$components.register('link_fragment-fieldtype', _components_Fieldtypes_LinkFragment_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);

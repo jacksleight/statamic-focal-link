@@ -12,11 +12,15 @@
             @meta-updated="meta.link.meta = $event"
         />
 
-        <div v-if="showFragmentField" class="mt-1 flex items-center">
+        <div class="mt-1 space-x-1 flex items-center">
         
-            <div class="w-40 mr-2">&nbsp;</div>
+            <div class="w-40 mr-1 flex-shrink-0 text-right">
+                <!-- <loading-graphic v-if="loading" :text="false" class="mt-1" /> -->
+            </div>
 
-            <div class="sfl-input flex-1 mr-1 flex items-center">
+            <div
+                v-if="queryEnabled()"
+                class="sfl-input flex-1 flex items-center">
 
                 <div class="sfl-prefix text-grey-60">?</div>
 
@@ -28,10 +32,8 @@
                     class="flex-1"
                     :value="queryValue"
                     :config="queryConfig"
-                    :meta="meta.query.meta"
-                    @focus="queryFocus"
+                    @focus="inputFocus"
                     @input="queryChanged"
-                    @meta-updated="meta.query.meta = $event"
                 />
                 <text-input
                     v-if="queryTemplate"
@@ -39,13 +41,16 @@
                     handle="query_template"
                     class="flex-1"
                     v-model="queryTemplate"
+                    append="⏎"
                     @keydown.enter="queryTemplateCommit"
                     @blur="queryTemplateCommit"
                 />
 
             </div>
 
-            <div class="sfl-input flex-1 flex items-center">
+            <div
+                v-if="fragmentEnabled()"
+                class="sfl-input flex-1 flex items-center">
 
                 <div class="sfl-prefix text-grey-60">#</div>
 
@@ -57,10 +62,8 @@
                     class="flex-1"
                     :value="fragmentValue"
                     :config="fragmentConfig"
-                    :meta="meta.fragment.meta"
-                    @focus="fragmentFocus"
+                    @focus="inputFocus"
                     @input="fragmentChanged"
-                    @meta-updated="meta.fragment.meta = $event"
                 />
                 <text-input
                     v-if="fragmentTemplate"
@@ -68,6 +71,7 @@
                     handle="fragment_template"
                     class="flex-1"
                     v-model="fragmentTemplate"
+                    append="⏎"
                     @keydown.enter="fragmentTemplateCommit"
                     @blur="fragmentTemplateCommit"
                 />
@@ -88,12 +92,12 @@ export default {
     data() {
 
         return {
+            linkSpec: this.meta.linkSpec,
             linkValue: this.meta.initialLink,
             queryValue: this.meta.initialQuery,
             fragmentValue: this.meta.initialFragment,
             queryTemplate: null,
             fragmentTemplate: null,
-            linkSpec: null,
             loading: false,
         }
 
@@ -102,53 +106,32 @@ export default {
     computed: {
 
         returnValue() {
-            let value = this.linkValue;
-            if (this.queryValue !== null) {
-                value += `?${this.queryValue}`;
+            if (!this.linkValue) {
+                return null;
             }
-            if (this.fragmentValue !== null) {
-                value += `#${this.fragmentValue}`;
+            if (this.queryValue) {
+                value.search = `?${this.queryValue}`;
             }
-            return value;
-        },
-
-        showQueryField() {
-            return true;
-            return this.linkValue && (
-                (this.linkValue.substr(0, 7) === 'entry::') ||
-                (this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrls) ||
-                (this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrls)
-            );
-        },
-
-        showFragmentField() {
-            return true;
-            return this.linkValue && (
-                (this.linkValue.substr(0, 7) === 'entry::') ||
-                (this.linkValue.substr(0, 7) === 'http://' && this.meta.scanUrls) ||
-                (this.linkValue.substr(0, 8) === 'https://' && this.meta.scanUrls)
-            );
+            if (this.fragmentValue) {
+                value.hash = `#${this.fragmentValue}`;
+            }
+            console.log(value);
+            return value.toString();
         },
 
         queryConfig() {       
             return {
-                ...this.meta.fragment.config,
-                placeholder: this.loading ? 'Loading' : 'query',
-                options: this.linkSpec ? {
-                    ...this.linkSpec.queries.templates,
-                    ...this.linkSpec.queries.options,
-                } : {},
+                taggable: true,
+                placeholder: this.loading ? '◉ loading…' : 'query',
+                options: this.queryEnabled() ? this.formatOptions(this.linkSpec.queries) : {},
             };
         },
 
         fragmentConfig() {            
             return {
-                ...this.meta.fragment.config,
-                placeholder: this.loading ? 'Loading' : 'fragment',
-                options: this.linkSpec ? {
-                    ...this.linkSpec.fragments.templates,
-                    ...this.linkSpec.fragments.options,
-                } : {},
+                taggable: true,
+                placeholder: this.loading ? '◉ loading…' : 'fragment',
+                options: this.fragmentEnabled() ? this.formatOptions(this.linkSpec.fragments) : {},
             };
         }
 
@@ -164,15 +147,30 @@ export default {
             this.fragmentTemplate = null;
             this.linkSpec = null;
             this.update(this.returnValue);
-            this.fetchSpec();
+            this.linkChangedDebounced();
         },
+    
+        linkChangedDebounced: _.debounce(function () {
+            if (this.linkValue) {
+                const url = new URL(this.linkValue);
+                if (url.search.length) {
+                    this.queryValue = url.search.substr(1);
+                }
+                if (url.hash.length) {
+                    this.fragmentValue = url.hash.substr(1);
+                }
+            }
+            this.$nextTick(() => {
+                return this.fetchLinkSpec();
+            });
+        }, 300),
 
         queryChanged(query) {
-            if (this.linkSpec && this.linkSpec.queries.templates[query]) {
-                this.queryTemplate = query;
-                this.$nextTick(() => {
-                    this.$refs.query_template.$refs.input.focus();
-                });
+            const prepared = this.prepareTemplate('query', query);
+            if (prepared) {
+                const [ preparedValue, onNextTick ] = prepared;
+                this.queryTemplate = preparedValue;
+                this.$nextTick(onNextTick);
             } else {
                 this.queryValue = query;
                 this.update(this.returnValue);
@@ -180,15 +178,34 @@ export default {
         },
 
         fragmentChanged(fragment) {
-            if (this.linkSpec && this.linkSpec.fragments.templates[fragment]) {
-                this.fragmentTemplate = fragment;
-                this.$nextTick(() => {
-                    this.$refs.fragment_template.$refs.input.focus();
-                });
+            const prepared = this.prepareTemplate('fragment', fragment);
+            if (prepared) {
+                const [ preparedValue, onNextTick ] = prepared;
+                this.fragmentTemplate = preparedValue;
+                this.$nextTick(onNextTick);
             } else {
                 this.fragmentValue = fragment;
                 this.update(this.returnValue);
             }
+        },
+
+        isTemplate(template) {
+            const placeholder = '?';
+            return (template ? template.indexOf(placeholder) : -1) !== -1;
+        },
+
+        prepareTemplate(type, template) {
+            const placeholder = '?';
+            const index = template ? template.indexOf(placeholder) : -1;
+            if (index === -1) {
+                return;
+            }
+            const value = template.substr(0, index) + template.substr(index + placeholder.length);
+            return [ value, () => {
+                const el = this.$refs[`${type}_template`].$refs.input;
+                el.focus();
+                el.setSelectionRange(index, index);
+            } ];
         },
 
         queryTemplateCommit() {
@@ -209,39 +226,60 @@ export default {
             this.update(this.returnValue);
         },
 
-        queryFocus() {
-            if (!this.linkSpec) {
-                this.fetchSpec();
+        inputFocus() {
+            if (this.linkSpecPending()) {
+                this.fetchLinkSpec(true);
             }
         },
 
-        fragmentFocus() {
-            if (!this.linkSpec) {
-                this.fetchSpec();
-            }
-        },
-
-        fetchSpec() {
-            const { cache } = window.StatamicLinkFragmentFieldtype;
-            const link = this.linkValue;
-            if (link === null) {
+        fetchLinkSpec(discover = false) {            
+            const { specCache, discoverCache } = window.StatamicLinkFragmentFieldtype;
+            const cache = discover ? discoverCache : specCache;
+            const value = this.linkValue;
+            if (value === null) {
                 return;
             }
-            if (cache[link]) {
-                this.linkSpec = cache[link];
+            if (cache[value]) {
+                this.linkSpec = cache[value];
                 return;
             }
             this.loading = true;
-            this.$axios.get(cp_url('fieldtypes/link_fragment/spec'), {
-                params: { link },
+            this.$axios.get(cp_url('fieldtypes/focal_link/spec'), {
+                params: { value, discover },
             }).then(response => {
                 this.linkSpec = response.data;
-                cache[link] = this.linkSpec;
+                cache[value] = this.linkSpec;
             }).catch(e => {
                 this.linkSpec = null;
             }).finally(e => {
                 this.loading = false;
             })
+        },
+
+        queryEnabled() {
+            return this.linkSpec && this.linkSpec.queries !== false;
+        },
+
+        fragmentEnabled() {
+            return this.linkSpec && this.linkSpec.fragments !== false;
+        },
+
+        linkSpecPending() {
+            return !this.linkSpec || (this.linkSpec.discover !== false && this.linkSpec.discovered === false);
+        },
+
+        formatOptions(options) {
+            return Object.fromEntries(Object.entries(options)
+                .map(([ value, label ]) => {
+                    label = label !== value ? `${value} — ${label}` : label;
+                    if (this.isTemplate(value)) {
+                        label = `${label}…`;
+                    }
+                    label = label.length > 80
+                        ? `${label.substr(0, 80)}…`
+                        : label;
+                    return [ value, label ];
+                }));
         },
 
     }

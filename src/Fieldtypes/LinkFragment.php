@@ -2,19 +2,14 @@
 
 namespace JackSleight\StatamicLinkFragmentFieldtype\Fieldtypes;
 
-use Str;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Field;
 use Facades\Statamic\Routing\ResolveRedirect;
+use JackSleight\StatamicLinkFragmentFieldtype\Facades\Utilities;
 
 class LinkFragment extends Fieldtype
 {
     protected $icon = 'link';
-
-    protected $defaultValue = [
-        'link'     => null,
-        'fragment' => null,
-    ];
 
     public static function title()
     {
@@ -39,8 +34,8 @@ class LinkFragment extends Fieldtype
             $linkValue,
             $queryValue,
             $fragmentValue,
-        ) = $this->parseValue($value);
-
+        ) = Utilities::parseValue($value);
+        
         $redirect = ResolveRedirect::resolve($linkValue, $this->field->parent());
 
         if ($redirect === 404) {
@@ -65,27 +60,24 @@ class LinkFragment extends Fieldtype
             $linkValue,
             $queryValue,
             $fragmentValue,
-        ) = $this->parseValue($value);
+        ) = Utilities::parseValue($value);
 
-        $linkFieldtype     = $this->nestedLinkFieldtype($linkValue);
-        $queryFieldtype    = $this->nestedQueryFieldtype($queryValue);
-        $fragmentFieldtype = $this->nestedFragmentFieldtype($fragmentValue);
+        list(
+            $linkType,
+            $linkVariant,
+        ) = Utilities::parseLink($linkValue);
+
+        $linkFieldtype = $this->nestedLinkFieldtype($linkValue);
+        $linkSpec = Utilities::getSpec($linkType, $linkVariant);
 
         return [
             'initialLink' => $linkValue,
             'initialQuery' => $queryValue,
             'initialFragment' => $fragmentValue,
+            'linkSpec' => $linkSpec,
             'link' => [
                 'config' => $linkFieldtype->config(),
                 'meta' => $linkFieldtype->preload(),
-            ],
-            'query' => [
-                'config' => $queryFieldtype->config(),
-                'meta' => $queryFieldtype->preload(),
-            ],
-            'fragment' => [
-                'config' => $fragmentFieldtype->config(),
-                'meta' => $fragmentFieldtype->preload(),
             ],
         ];
     }
@@ -104,58 +96,5 @@ class LinkFragment extends Fieldtype
         ));
 
         return $linkField->fieldtype();
-    }
-
-    protected function nestedQueryFieldtype($value): Fieldtype
-    {
-        $queryField = (new Field('fragment', [
-            'type' => 'select',
-            'taggable' => true,
-        ]));
-
-        $queryField->setValue($value);
-
-        return $queryField->fieldtype();
-    }
-
-    protected function nestedFragmentFieldtype($value): Fieldtype
-    {
-        $fragmentField = (new Field('fragment', [
-            'type' => 'select',
-            'taggable' => true,
-        ]));
-
-        $fragmentField->setValue($value);
-
-        return $fragmentField->fieldtype();
-    }
-
-    protected function parseValue($value)
-    {
-        $linkValue     = null;
-        $queryValue    = null;
-        $fragmentValue = null;
-
-        if (isset($value)) {
-
-            $url = parse_url($value);
-            
-            if (isset($url['query'])) {
-                $linkValue = Str::before($value, '?');
-            } else if (isset($url['fragment'])) {
-                $linkValue = Str::before($value, '#');
-            } else {
-                $linkValue = $value;
-            }
-            $queryValue    = $url['query'] ?? null;
-            $fragmentValue = $url['fragment'] ?? null;
-            
-        }
-        
-        return [
-            $linkValue,
-            $queryValue,
-            $fragmentValue,
-        ];
     }
 }
