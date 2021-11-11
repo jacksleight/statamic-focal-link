@@ -8,34 +8,54 @@ use Statamic\Facades\Entry;
 
 class Utilities
 {   
-    public function getSpec($type, $variant)
+    protected $presets;
+
+    protected $classes;
+
+    public function __construct($presets, $classes)
     {
-        if (!isset($type) || !isset($variant)) {
+        $this->presets = collect($presets);
+        $this->classes = collect($classes);
+    }
+
+    public function getSpec($value)
+    {
+        if (!isset($value)) {
             return;
         }
 
-        $data = config('statamic.link_fragment_fieldtype');
-
-        $spec =
-            $data["{$type}:{$variant}"] ??
-            $data["{$type}:*"] ??
-            $data["*"] ??
-            null;
-        if (!isset($spec)) {
-            return [
-                'queries'    => false,
-                'fragments'  => false,
-                'discover'   => false,
-                'discovered' => false,
-            ];
-        }
-
-        $spec += [
-            'queries'    => [],
-            'fragments'  => [],
-            'discover'   => false,
+        $spec = [
+            'queries'    => false,
+            'fragments'  => false,
+            'discovery'  => false,
             'discovered' => false,
         ];
+
+        $filter = function ($data, $format) use ($value) {
+            if (Str::startsWith($format, 'https://')) {
+                $format = 'http://' . Str::after($format, 'https://');
+            }
+            return Str::is($format, $value);
+        };
+
+        collect()
+            ->merge($this->presets->filter($filter)->values())
+            ->merge($this->classes->filter($filter)->values())
+            ->each(function ($data) use (&$spec) {
+                if (!is_array($data)) {
+                    return;
+                }
+                foreach ($data as $key => $list) {
+                    if (!isset($spec[$key])) {
+                        return;
+                    }
+                    if (is_array($spec[$key]) && is_array($list)) {
+                        $spec[$key] = array_merge($spec[$key], $list);
+                    } else {
+                        $spec[$key] = $list;
+                    }
+                }
+            });
 
         return $spec;
     }
@@ -71,28 +91,36 @@ class Utilities
 
     public function parseLink($link)
     {
-        $linkType    = null;
-        $linkVariant = null;
-        $linkId      = null;
+        $linkType  = null;
+        $linkClass = null;
+        $linkRaw   = null;
 
         if (isset($link)) {
 
             if (Str::startsWith($link, 'entry::')) {
-                $linkId      = Str::after($link, 'entry::');
-                $linkType    = 'entry';
-                $linkVariant = Entry::find($linkId)->collection()->handle();
-            } else if (Str::startsWith($link, 'http://') || Str::startsWith($link, 'https://')) {
-                $linkId      = $link;
-                $linkType    = 'http';
-                $linkVariant = parse_url($link)['host'];
+                $id    = Str::after($link, 'entry::');
+                $entry = Entry::find($id);
+                if ($entry && $entry->url()) {
+                    $linkType  = 'entry';
+                    $linkClass = 'entry::' . $entry->collection()->handle() . '/' . $entry->blueprint()->handle();
+                    $linkRaw   = $id;
+                }
+            } else if ($link !== '@child') {
+                $linkType  = 'url';
+                $linkClass = $link;
+                $linkRaw   = $link;
+                if (Str::startsWith($linkClass, 'https://')) {
+                    $linkClass = 'http://' . Str::after($linkClass, 'https://');
+                }
             }
             
         }
         
         return [
             $linkType,
-            $linkVariant,
-            $linkId,
+            $linkClass,
+            $linkRaw,
         ];
     }
+    
 }

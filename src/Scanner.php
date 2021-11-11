@@ -2,43 +2,48 @@
 
 namespace JackSleight\StatamicLinkFragmentFieldtype;
 
-use Exception;
+use DOMAttr;
 use DOMDocument;
+use DOMElement;
 use DOMXPath;
-use Str;
+use Exception;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Statamic\Facades\Entry;
+use Str;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class Scanner
 {
-    public function scan($type, $id, $spec)
+    public function scan($type, $raw, $spec)
     {
-        $fragments = [];
+        if (!is_array($spec['discovery']) || !is_array($spec['fragments'])) {
+            return $spec;
+        }
 
         try {
             
             $html = null;
 
             if ($type === 'entry') {
-                $html  = $this->fetchEntryHtml($id);
-            } else if ($type === 'http') {
-                $html  = $this->fetchHttpHtml($id);
+                $html = $this->fetchEntryHtml($raw);
+            } else if ($type === 'url') {
+                $html = $this->fetchUrlHtml($raw);
             }
 
-            $fragments = $this->findFragments($html, $spec);
+            $spec['fragments'] += $this->findFragments($html, $spec);
 
         } catch (Exception $e) {
             throw $e;
         }
 
-        return $fragments;
+        $spec['discovered'] = true;
+
+        return $spec;
     }
 
     protected function fetchEntryHtml($id)
     {
         $entry = Entry::find($id);
-        
         if (!$entry || !$entry->url()) {
             throw new Excpetion;
         }
@@ -51,17 +56,19 @@ class Scanner
         return $html;
     }
 
-    protected function fetchHttpHtml($url)
+    protected function fetchUrlHtml($url)
     {
-        $html = @file_get_contents($url);
+        if (Str::startsWith($url, 'http://') || Str::startsWith($url, 'https://')) {
+            $html = @file_get_contents($url);
+        } else {
+            $html = null;
+        }
 
-        return $html ?? null;
+        return $html;
     }
 
     protected function findFragments($html, $spec)
     {
-        $toNull = fn ($value) => empty($value) ? null : $value;
-
         $fragments = collect();
 
         $dom = new DOMDocument();
@@ -71,54 +78,38 @@ class Scanner
 
         $xpath = new DOMXPath($dom);
 
-        $root = isset($spec['within'])
-            ? $xpath->query($this->parsePointer($spec['within']))->item(0)
-            : $dom->getElementsByTagName('body')->item(0);
+        foreach ($spec['discovery'] as $targetQuery => $labelQuery) {
 
-        $nodes = $xpath->query('.//*[@id]', $root);
-        foreach ($nodes as $node) {
-            $value = $node->getAttribute('id');
-            if (isset($spec['except']) && in_array($value, $spec['except'])) {
-                continue;
-            }
-            if (isset($spec['regex'])) {
-                if (is_string($spec['regex'])) {
-                    if (!preg_match($spec['regex'], $value)) {
-                        continue;
-                    }
-                } else if (is_array($spec['regex'])) {
-                    $pattern     = key($spec['regex']);
-                    $replacement = current($spec['regex']);
-                    if (!preg_match($pattern, $value)) {
-                        continue;
-                    } else {
-                        $value = preg_replace($pattern, $replacement, $value);
+            $nodes = $xpath->query($targetQuery);
+
+            foreach ($nodes as $node) {
+
+                $targetNode = $node instanceof DOMElement
+                    ? $node->getAttributeNode('id')
+                    : $node;
+                $value = trim($targetNode->textContent);
+                $label = Str::headline($value);
+
+                if (is_string($labelQuery)) {
+                    $refNode = $node instanceof DOMAttr
+                        ? $node->parentNode
+                        : $node;
+                    $labelNodes = $xpath->query($labelQuery, $refNode);
+                    if ($labelNodes->length) {
+                        $labelNode = $labelNodes->item(0);
+                        $labelText = trim(preg_replace('/\s+/', ' ', $labelNode->textContent));
+                        if (!empty($labelText)) {
+                            $label = $labelText;
+                        }
                     }
                 }
+
+                $fragments->put($value, $label);
+
             }
-            $label = null;
-            $check = ($spec['labels']['parent'] ?? false) ? $node->parentNode : $node;
-            if (isset($spec['labels']['attribute'])) {
-                $label = $toNull($check->getAttribute($spec['labels']['attribute']));
-            }
-            if (!isset($label) && isset($spec['labels']['content'])) {
-                $label = $toNull($check->textContent);
-            }
-            $fragments->put($value, $label ?? $value);
+
         }
 
-        return $fragments->all();
-    }
-
-    protected function parsePointer($value)
-    {
-        if (Str::startsWith($value, '/')) {
-            return $value;
-        } else if (Str::startsWith($value, '#')) {
-            $id = Str::after($value, '#');
-            return "//*[@id='{$id}']";
-        }
-
-        throw new Exception("Invalid element pointer value: {$value}");
+        return $fragments->sortKeys()->all();
     }
 }

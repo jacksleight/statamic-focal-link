@@ -21,20 +21,14 @@ class Controller extends CpController
 
         list(
             $linkType,
-            $linkVariant,
-            $linkId,
+            $linkClass,
+            $linkRaw,
         ) = Utilities::parseLink($linkValue);
 
-        $linkSpec = Utilities::getSpec($linkType, $linkVariant);
+        $linkSpec = Utilities::getSpec($linkClass);
 
-        if ($discover && $linkSpec && $linkSpec['discover'] !== false) {
-            if ($linkSpec['fragments'] !== false) {
-                $linkSpec['fragments'] = array_merge(
-                    $linkSpec['fragments'],
-                    Scanner::scan($linkType, $linkId, $linkSpec['discover'])
-                );
-            }
-            $linkSpec['discovered'] = true;
+        if ($discover && $linkSpec) {
+            $linkSpec = Scanner::scan($linkType, $linkRaw, $linkSpec);
         }
 
         return $linkSpec;

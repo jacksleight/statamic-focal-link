@@ -4,33 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Link Variants
+    | Link Classes
     |--------------------------------------------------------------------------
-    |
-    | Configuration for different link variants.
-    |
     */
 
-    // Entry Links
+    'classes' => [
 
-    'entry:*' => [
-        'queries' => false,
-        'fragments' => [
-            ':~:text=?&potato' => 'Text Fragment',
-        ],
-        'discover' => [
-            'labels' => [
-                'content' => true,
+        'entry::pages/*' => [
+            'discovery' => [
+                "//*[@id]" => "text()",
             ],
         ],
-    ],
 
-    // URL Links
-
-    'url:*' => [
-        'fragments' => [
-            ':~:text={{}}' => 'Text Fragment',
-        ],
     ],
 
 ];

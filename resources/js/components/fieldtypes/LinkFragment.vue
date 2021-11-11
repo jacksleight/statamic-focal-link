@@ -14,31 +14,47 @@
 
         <div class="mt-1 space-x-1 flex items-center">
         
-            <div class="w-40 mr-1 flex-shrink-0 text-right">
-                <!-- <loading-graphic v-if="loading" :text="false" class="mt-1" /> -->
-            </div>
+            <div class="w-40 mr-1 flex-shrink-0 text-right"></div>
 
             <div
-                v-if="queryEnabled()"
+                v-if="queryEnabled"
                 class="sfl-input flex-1 flex items-center">
 
                 <div class="sfl-prefix text-grey-60">?</div>
 
                 <!-- Query field -->
-                <select-fieldtype
+
+                <v-select
                     v-if="!queryTemplate"
                     ref="query"
-                    handle="query"
                     class="flex-1"
                     :value="queryValue"
-                    :config="queryConfig"
-                    @focus="inputFocus"
+                    :reduce="option => option.value"
+                    :create-option="value => ({ value, label: value, title: null })"
+                    :clearable="true"
+                    :options="queryOptions"
+                    :placeholder="loading ? '◉ loading…' : 'query'"
+                    :searchable="true"
+                    :taggable="true"
+                    :close-on-select="true"
                     @input="queryChanged"
-                />
+                    @open="selectOpen">
+                    <template #option="option">
+                        <div class="flex items-center" v-if="!option.loading">
+                            <span class="flex-1">{{ option.label }}</span>
+                            <strong>{{ option.title }}</strong>
+                        </div>
+                        <div v-if="option.loading">
+                            <loading-graphic v-if="loading" :inline="true" />
+                        </div>
+                    </template>
+                    <template #no-options>
+                        <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                    </template>
+                </v-select>
                 <text-input
                     v-if="queryTemplate"
                     ref="query_template"
-                    handle="query_template"
                     class="flex-1"
                     v-model="queryTemplate"
                     append="⏎"
@@ -49,26 +65,43 @@
             </div>
 
             <div
-                v-if="fragmentEnabled()"
+                v-if="fragmentEnabled"
                 class="sfl-input flex-1 flex items-center">
 
                 <div class="sfl-prefix text-grey-60">#</div>
 
                 <!-- Fragment field -->
-                <select-fieldtype
+                <v-select
                     v-if="!fragmentTemplate"
                     ref="fragment"
-                    handle="fragment"
                     class="flex-1"
                     :value="fragmentValue"
-                    :config="fragmentConfig"
-                    @focus="inputFocus"
+                    :reduce="option => option.value"
+                    :create-option="value => ({ value, label: value, title: null })"
+                    :clearable="true"
+                    :options="fragmentOptions"
+                    :placeholder="loading ? '◉ loading…' : 'fragment'"
+                    :searchable="true"
+                    :taggable="true"
+                    :close-on-select="true"
                     @input="fragmentChanged"
-                />
+                    @open="selectOpen">
+                    <template #option="option">
+                        <div class="flex items-center" v-if="!option.loading">
+                            <span class="flex-1">{{ option.label }}</span>
+                            <strong>{{ option.title }}</strong>
+                        </div>
+                        <div v-if="option.loading">
+                            <loading-graphic v-if="loading" :inline="true" />
+                        </div>
+                    </template>
+                    <template #no-options>
+                        <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                    </template>
+                </v-select>
                 <text-input
                     v-if="fragmentTemplate"
                     ref="fragment_template"
-                    handle="fragment_template"
                     class="flex-1"
                     v-model="fragmentTemplate"
                     append="⏎"
@@ -84,6 +117,8 @@
 </template>
 
 <script>
+
+const templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
 
 export default {
 
@@ -103,37 +138,79 @@ export default {
 
     },
 
+    watch: {
+
+        queryValue() {
+            this.update(this.returnValue);
+        },
+        
+        fragmentValue() {
+            this.update(this.returnValue);
+        },
+
+    },
+
     computed: {
 
         returnValue() {
             if (!this.linkValue) {
                 return null;
             }
+            const value = new URL(this.linkValue);
             if (this.queryValue) {
                 value.search = `?${this.queryValue}`;
             }
             if (this.fragmentValue) {
                 value.hash = `#${this.fragmentValue}`;
             }
-            console.log(value);
             return value.toString();
         },
 
-        queryConfig() {       
-            return {
-                taggable: true,
-                placeholder: this.loading ? '◉ loading…' : 'query',
-                options: this.queryEnabled() ? this.formatOptions(this.linkSpec.queries) : {},
-            };
+        queryOptions() {       
+            if (!this.queryEnabled) {
+                return {};
+            }
+            const options = this.prepareOptions(this.linkSpec.queries);
+            if (this.loading) {
+                options.push({
+                    value: '__loading__',
+                    label: null,
+                    title: null,
+                    template: true,
+                    loading: true,
+                });
+            }
+            return options;
         },
 
-        fragmentConfig() {            
-            return {
-                taggable: true,
-                placeholder: this.loading ? '◉ loading…' : 'fragment',
-                options: this.fragmentEnabled() ? this.formatOptions(this.linkSpec.fragments) : {},
-            };
-        }
+        fragmentOptions() {            
+            if (!this.fragmentEnabled) {
+                return {};
+            }
+            const options = this.prepareOptions(this.linkSpec.fragments);
+            if (this.loading) {
+                options.push({
+                    value: '__loading__',
+                    label: null,
+                    title: null,
+                    template: true,
+                    loading: true,
+                });
+            }
+            return options;
+        },
+
+        queryEnabled() {
+            return this.linkSpec && typeof this.linkSpec.queries === 'object';
+        },
+
+        fragmentEnabled() {
+            return this.linkSpec && typeof this.linkSpec.fragments === 'object';
+        },
+
+        linkSpecPending() {
+            return !this.linkSpec || (typeof this.linkSpec.discovery === 'object' && !this.linkSpec.discovered);
+        },
 
     },
 
@@ -166,6 +243,9 @@ export default {
         }, 300),
 
         queryChanged(query) {
+            if (query === '__loading__') {
+                return;
+            }
             const prepared = this.prepareTemplate('query', query);
             if (prepared) {
                 const [ preparedValue, onNextTick ] = prepared;
@@ -178,6 +258,9 @@ export default {
         },
 
         fragmentChanged(fragment) {
+            if (fragment === '__loading__') {
+                return;
+            }
             const prepared = this.prepareTemplate('fragment', fragment);
             if (prepared) {
                 const [ preparedValue, onNextTick ] = prepared;
@@ -189,22 +272,19 @@ export default {
             }
         },
 
-        isTemplate(template) {
-            const placeholder = '?';
-            return (template ? template.indexOf(placeholder) : -1) !== -1;
+        isTemplate(value) {
+            return templatePattern.exec(value) !== null
         },
 
-        prepareTemplate(type, template) {
-            const placeholder = '?';
-            const index = template ? template.indexOf(placeholder) : -1;
-            if (index === -1) {
+        prepareTemplate(type, value) {
+            const match = templatePattern.exec(value);
+            if (match === null) {
                 return;
             }
-            const value = template.substr(0, index) + template.substr(index + placeholder.length);
             return [ value, () => {
                 const el = this.$refs[`${type}_template`].$refs.input;
                 el.focus();
-                el.setSelectionRange(index, index);
+                el.setSelectionRange(match.index, match.index + match[0].length);
             } ];
         },
 
@@ -226,8 +306,8 @@ export default {
             this.update(this.returnValue);
         },
 
-        inputFocus() {
-            if (this.linkSpecPending()) {
+        selectOpen() {
+            if (this.linkSpecPending) {
                 this.fetchLinkSpec(true);
             }
         },
@@ -256,30 +336,23 @@ export default {
             })
         },
 
-        queryEnabled() {
-            return this.linkSpec && this.linkSpec.queries !== false;
-        },
-
-        fragmentEnabled() {
-            return this.linkSpec && this.linkSpec.fragments !== false;
-        },
-
-        linkSpecPending() {
-            return !this.linkSpec || (this.linkSpec.discover !== false && this.linkSpec.discovered === false);
-        },
-
-        formatOptions(options) {
-            return Object.fromEntries(Object.entries(options)
+        prepareOptions(options) {
+            return Object.entries(options)
+                .filter(([ value, label ]) => label)
                 .map(([ value, label ]) => {
-                    label = label !== value ? `${value} — ${label}` : label;
                     if (this.isTemplate(value)) {
                         label = `${label}…`;
                     }
                     label = label.length > 80
                         ? `${label.substr(0, 80)}…`
                         : label;
-                    return [ value, label ];
-                }));
+                    return { 
+                        value: value,
+                        label: value,
+                        title: label,
+                        loading: false,
+                     };
+                });
         },
 
     }

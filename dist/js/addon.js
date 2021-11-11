@@ -24,6 +24,8 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 //
 //
 //
@@ -109,6 +111,40 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
   data: function data() {
@@ -122,11 +158,21 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       loading: false
     };
   },
+  watch: {
+    queryValue: function queryValue() {
+      this.update(this.returnValue);
+    },
+    fragmentValue: function fragmentValue() {
+      this.update(this.returnValue);
+    }
+  },
   computed: {
     returnValue: function returnValue() {
       if (!this.linkValue) {
         return null;
       }
+
+      var value = new URL(this.linkValue);
 
       if (this.queryValue) {
         value.search = "?".concat(this.queryValue);
@@ -136,22 +182,54 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         value.hash = "#".concat(this.fragmentValue);
       }
 
-      console.log(value);
       return value.toString();
     },
-    queryConfig: function queryConfig() {
-      return {
-        taggable: true,
-        placeholder: this.loading ? '◉ loading…' : 'query',
-        options: this.queryEnabled() ? this.formatOptions(this.linkSpec.queries) : {}
-      };
+    queryOptions: function queryOptions() {
+      if (!this.queryEnabled) {
+        return {};
+      }
+
+      var options = this.prepareOptions(this.linkSpec.queries);
+
+      if (this.loading) {
+        options.push({
+          value: '__loading__',
+          label: null,
+          title: null,
+          template: true,
+          loading: true
+        });
+      }
+
+      return options;
     },
-    fragmentConfig: function fragmentConfig() {
-      return {
-        taggable: true,
-        placeholder: this.loading ? '◉ loading…' : 'fragment',
-        options: this.fragmentEnabled() ? this.formatOptions(this.linkSpec.fragments) : {}
-      };
+    fragmentOptions: function fragmentOptions() {
+      if (!this.fragmentEnabled) {
+        return {};
+      }
+
+      var options = this.prepareOptions(this.linkSpec.fragments);
+
+      if (this.loading) {
+        options.push({
+          value: '__loading__',
+          label: null,
+          title: null,
+          template: true,
+          loading: true
+        });
+      }
+
+      return options;
+    },
+    queryEnabled: function queryEnabled() {
+      return this.linkSpec && _typeof(this.linkSpec.queries) === 'object';
+    },
+    fragmentEnabled: function fragmentEnabled() {
+      return this.linkSpec && _typeof(this.linkSpec.fragments) === 'object';
+    },
+    linkSpecPending: function linkSpecPending() {
+      return !this.linkSpec || _typeof(this.linkSpec.discovery) === 'object' && !this.linkSpec.discovered;
     }
   },
   methods: {
@@ -185,6 +263,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       });
     }, 300),
     queryChanged: function queryChanged(query) {
+      if (query === '__loading__') {
+        return;
+      }
+
       var prepared = this.prepareTemplate('query', query);
 
       if (prepared) {
@@ -200,6 +282,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       }
     },
     fragmentChanged: function fragmentChanged(fragment) {
+      if (fragment === '__loading__') {
+        return;
+      }
+
       var prepared = this.prepareTemplate('fragment', fragment);
 
       if (prepared) {
@@ -214,26 +300,23 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         this.update(this.returnValue);
       }
     },
-    isTemplate: function isTemplate(template) {
-      var placeholder = '?';
-      return (template ? template.indexOf(placeholder) : -1) !== -1;
+    isTemplate: function isTemplate(value) {
+      return templatePattern.exec(value) !== null;
     },
-    prepareTemplate: function prepareTemplate(type, template) {
+    prepareTemplate: function prepareTemplate(type, value) {
       var _this2 = this;
 
-      var placeholder = '?';
-      var index = template ? template.indexOf(placeholder) : -1;
+      var match = templatePattern.exec(value);
 
-      if (index === -1) {
+      if (match === null) {
         return;
       }
 
-      var value = template.substr(0, index) + template.substr(index + placeholder.length);
       return [value, function () {
         var el = _this2.$refs["".concat(type, "_template")].$refs.input;
 
         el.focus();
-        el.setSelectionRange(index, index);
+        el.setSelectionRange(match.index, match.index + match[0].length);
       }];
     },
     queryTemplateCommit: function queryTemplateCommit() {
@@ -254,8 +337,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       this.fragmentTemplate = null;
       this.update(this.returnValue);
     },
-    inputFocus: function inputFocus() {
-      if (this.linkSpecPending()) {
+    selectOpen: function selectOpen() {
+      if (this.linkSpecPending) {
         this.fetchLinkSpec(true);
       }
     },
@@ -293,32 +376,32 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         _this3.loading = false;
       });
     },
-    queryEnabled: function queryEnabled() {
-      return this.linkSpec && this.linkSpec.queries !== false;
-    },
-    fragmentEnabled: function fragmentEnabled() {
-      return this.linkSpec && this.linkSpec.fragments !== false;
-    },
-    linkSpecPending: function linkSpecPending() {
-      return !this.linkSpec || this.linkSpec.discover !== false && this.linkSpec.discovered === false;
-    },
-    formatOptions: function formatOptions(options) {
+    prepareOptions: function prepareOptions(options) {
       var _this4 = this;
 
-      return Object.fromEntries(Object.entries(options).map(function (_ref) {
+      return Object.entries(options).filter(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             value = _ref2[0],
             label = _ref2[1];
 
-        label = label !== value ? "".concat(value, " \u2014 ").concat(label) : label;
+        return label;
+      }).map(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            value = _ref4[0],
+            label = _ref4[1];
 
         if (_this4.isTemplate(value)) {
           label = "".concat(label, "\u2026");
         }
 
         label = label.length > 80 ? "".concat(label.substr(0, 80), "\u2026") : label;
-        return [value, label];
-      }));
+        return {
+          value: value,
+          label: value,
+          title: label,
+          loading: false
+        };
+      });
     }
   }
 });
@@ -851,7 +934,7 @@ var render = function () {
       _c("div", { staticClass: "mt-1 space-x-1 flex items-center" }, [
         _c("div", { staticClass: "w-40 mr-1 flex-shrink-0 text-right" }),
         _vm._v(" "),
-        _vm.queryEnabled()
+        _vm.queryEnabled
           ? _c(
               "div",
               { staticClass: "sfl-input flex-1 flex items-center" },
@@ -861,15 +944,85 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 !_vm.queryTemplate
-                  ? _c("select-fieldtype", {
+                  ? _c("v-select", {
                       ref: "query",
                       staticClass: "flex-1",
                       attrs: {
-                        handle: "query",
                         value: _vm.queryValue,
-                        config: _vm.queryConfig,
+                        reduce: function (option) {
+                          return option.value
+                        },
+                        "create-option": function (value) {
+                          return { value: value, label: value, title: null }
+                        },
+                        clearable: true,
+                        options: _vm.queryOptions,
+                        placeholder: _vm.loading ? "◉ loading…" : "query",
+                        searchable: true,
+                        taggable: true,
+                        "close-on-select": true,
                       },
-                      on: { focus: _vm.inputFocus, input: _vm.queryChanged },
+                      on: { input: _vm.queryChanged, open: _vm.selectOpen },
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "option",
+                            fn: function (option) {
+                              return [
+                                !option.loading
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "flex items-center" },
+                                      [
+                                        _c("span", { staticClass: "flex-1" }, [
+                                          _vm._v(_vm._s(option.label)),
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("strong", [
+                                          _vm._v(_vm._s(option.title)),
+                                        ]),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                option.loading
+                                  ? _c(
+                                      "div",
+                                      [
+                                        _vm.loading
+                                          ? _c("loading-graphic", {
+                                              attrs: { inline: true },
+                                            })
+                                          : _vm._e(),
+                                      ],
+                                      1
+                                    )
+                                  : _vm._e(),
+                              ]
+                            },
+                          },
+                          {
+                            key: "no-options",
+                            fn: function () {
+                              return [
+                                _c("div", {
+                                  staticClass:
+                                    "text-sm text-grey-70 text-left py-1 px-2",
+                                  domProps: {
+                                    textContent: _vm._s(
+                                      _vm.__("No options to choose from.")
+                                    ),
+                                  },
+                                }),
+                              ]
+                            },
+                            proxy: true,
+                          },
+                        ],
+                        null,
+                        false,
+                        1903376315
+                      ),
                     })
                   : _vm._e(),
                 _vm._v(" "),
@@ -877,7 +1030,7 @@ var render = function () {
                   ? _c("text-input", {
                       ref: "query_template",
                       staticClass: "flex-1",
-                      attrs: { handle: "query_template", append: "⏎" },
+                      attrs: { append: "⏎" },
                       on: {
                         keydown: function ($event) {
                           if (
@@ -910,7 +1063,7 @@ var render = function () {
             )
           : _vm._e(),
         _vm._v(" "),
-        _vm.fragmentEnabled()
+        _vm.fragmentEnabled
           ? _c(
               "div",
               { staticClass: "sfl-input flex-1 flex items-center" },
@@ -920,15 +1073,85 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 !_vm.fragmentTemplate
-                  ? _c("select-fieldtype", {
+                  ? _c("v-select", {
                       ref: "fragment",
                       staticClass: "flex-1",
                       attrs: {
-                        handle: "fragment",
                         value: _vm.fragmentValue,
-                        config: _vm.fragmentConfig,
+                        reduce: function (option) {
+                          return option.value
+                        },
+                        "create-option": function (value) {
+                          return { value: value, label: value, title: null }
+                        },
+                        clearable: true,
+                        options: _vm.fragmentOptions,
+                        placeholder: _vm.loading ? "◉ loading…" : "fragment",
+                        searchable: true,
+                        taggable: true,
+                        "close-on-select": true,
                       },
-                      on: { focus: _vm.inputFocus, input: _vm.fragmentChanged },
+                      on: { input: _vm.fragmentChanged, open: _vm.selectOpen },
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "option",
+                            fn: function (option) {
+                              return [
+                                !option.loading
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "flex items-center" },
+                                      [
+                                        _c("span", { staticClass: "flex-1" }, [
+                                          _vm._v(_vm._s(option.label)),
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("strong", [
+                                          _vm._v(_vm._s(option.title)),
+                                        ]),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                option.loading
+                                  ? _c(
+                                      "div",
+                                      [
+                                        _vm.loading
+                                          ? _c("loading-graphic", {
+                                              attrs: { inline: true },
+                                            })
+                                          : _vm._e(),
+                                      ],
+                                      1
+                                    )
+                                  : _vm._e(),
+                              ]
+                            },
+                          },
+                          {
+                            key: "no-options",
+                            fn: function () {
+                              return [
+                                _c("div", {
+                                  staticClass:
+                                    "text-sm text-grey-70 text-left py-1 px-2",
+                                  domProps: {
+                                    textContent: _vm._s(
+                                      _vm.__("No options to choose from.")
+                                    ),
+                                  },
+                                }),
+                              ]
+                            },
+                            proxy: true,
+                          },
+                        ],
+                        null,
+                        false,
+                        1903376315
+                      ),
                     })
                   : _vm._e(),
                 _vm._v(" "),
@@ -936,7 +1159,7 @@ var render = function () {
                   ? _c("text-input", {
                       ref: "fragment_template",
                       staticClass: "flex-1",
-                      attrs: { handle: "fragment_template", append: "⏎" },
+                      attrs: { append: "⏎" },
                       on: {
                         keydown: function ($event) {
                           if (

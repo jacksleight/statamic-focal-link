@@ -64,11 +64,11 @@ class LinkFragment extends Fieldtype
 
         list(
             $linkType,
-            $linkVariant,
+            $linkClass,
         ) = Utilities::parseLink($linkValue);
 
         $linkFieldtype = $this->nestedLinkFieldtype($linkValue);
-        $linkSpec = Utilities::getSpec($linkType, $linkVariant);
+        $linkSpec = Utilities::getSpec($linkClass);
 
         return [
             'initialLink' => $linkValue,

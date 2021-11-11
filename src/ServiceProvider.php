@@ -25,14 +25,13 @@ class ServiceProvider extends AddonServiceProvider
         parent::register();
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/statamic/presets.php', 'statamic.link_fragment_fieldtype',
-        );
-        $this->mergeConfigFrom(
             __DIR__ . '/../config/statamic/link_fragment_fieldtype.php', 'statamic.link_fragment_fieldtype',
         );
 
         $this->app->singleton(Utilities::class, function () {
-            return new Utilities();
+            $presets = require_once __DIR__.'/../data/presets.php';
+            $classes = config('statamic.link_fragment_fieldtype.classes');
+            return new Utilities($presets, $classes);
         });
         $this->app->singleton(Scanner::class, function () {
             return new Scanner();

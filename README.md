@@ -20,7 +20,7 @@ composer require jacksleight/statamic-focal-link
 
 ## Configuration
 
-You can configure which options are offered for different link variants by publishing the config:
+You can configure which options are avaliable for each link class by publishing the config:
 
 ```bash
 php please vendor:publish --tag=statamic-focal-link-config
@@ -28,7 +28,7 @@ php please vendor:publish --tag=statamic-focal-link-config
 
 And then opening `config/statamic/focal_link.php`.
 
-Each key in the confguration relates to a specific link variant. Entry links are defined with an `entry:[collection]` key, URL links are defined with an `http:[host]` key. You can also define fallback settings per type, or globally with an asterisk eg. `entry:*` and just `*`.
+Each key in the confguration relates to a specific link class. Entry links are defined with an `entry::[collection]/[blueprint]` key, URL link keys are the full URL up to the end of the path. You can use asterisks to perform wildcard matches.
 
 Query and fragment options can either be a fixed value or a template value. Templates must contain the string `{{}}`, which is where the cursor will be placed when the template is selected.
 
@@ -38,9 +38,9 @@ Here is an example and description of all avaliable settings:
 
 ```php
 /*
-The link variant key
+The link class key
 */
-'entry:products' => [
+'entry::products/*' => [
 
     /*
     The query string options
