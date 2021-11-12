@@ -228,6 +228,9 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
     fragmentEnabled: function fragmentEnabled() {
       return this.linkSpec && _typeof(this.linkSpec.fragments) === 'object';
     },
+    bothEnabled: function bothEnabled() {
+      return this.queryEnabled && this.fragmentEnabled;
+    },
     linkSpecPending: function linkSpecPending() {
       return !this.linkSpec || _typeof(this.linkSpec.discovery) === 'object' && !this.linkSpec.discovered;
     }
@@ -424,7 +427,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text {\n    padding-left: 20px !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text {\n    padding-left: 20px !important;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -948,6 +951,7 @@ var render = function () {
                       ref: "query",
                       staticClass: "flex-1",
                       attrs: {
+                        placeholder: "query",
                         value: _vm.queryValue,
                         reduce: function (option) {
                           return option.value
@@ -957,7 +961,6 @@ var render = function () {
                         },
                         clearable: true,
                         options: _vm.queryOptions,
-                        placeholder: _vm.loading ? "◉ loading…" : "query",
                         searchable: true,
                         taggable: true,
                         "close-on-select": true,
@@ -972,9 +975,13 @@ var render = function () {
                                 !option.loading
                                   ? _c(
                                       "div",
-                                      { staticClass: "flex items-center" },
+                                      {
+                                        class: !_vm.bothEnabled
+                                          ? "flex flex-wrap justify-between"
+                                          : "flex flex-col",
+                                      },
                                       [
-                                        _c("span", { staticClass: "flex-1" }, [
+                                        _c("span", [
                                           _vm._v(_vm._s(option.label)),
                                         ]),
                                         _vm._v(" "),
@@ -991,7 +998,10 @@ var render = function () {
                                       [
                                         _vm.loading
                                           ? _c("loading-graphic", {
-                                              attrs: { inline: true },
+                                              attrs: {
+                                                inline: true,
+                                                text: "Searching…",
+                                              },
                                             })
                                           : _vm._e(),
                                       ],
@@ -1021,7 +1031,7 @@ var render = function () {
                         ],
                         null,
                         false,
-                        1903376315
+                        52952055
                       ),
                     })
                   : _vm._e(),
@@ -1077,6 +1087,7 @@ var render = function () {
                       ref: "fragment",
                       staticClass: "flex-1",
                       attrs: {
+                        placeholder: "fragment",
                         value: _vm.fragmentValue,
                         reduce: function (option) {
                           return option.value
@@ -1086,7 +1097,6 @@ var render = function () {
                         },
                         clearable: true,
                         options: _vm.fragmentOptions,
-                        placeholder: _vm.loading ? "◉ loading…" : "fragment",
                         searchable: true,
                         taggable: true,
                         "close-on-select": true,
@@ -1101,9 +1111,13 @@ var render = function () {
                                 !option.loading
                                   ? _c(
                                       "div",
-                                      { staticClass: "flex items-center" },
+                                      {
+                                        class: !_vm.bothEnabled
+                                          ? "flex flex-wrap justify-between"
+                                          : "flex flex-col",
+                                      },
                                       [
-                                        _c("span", { staticClass: "flex-1" }, [
+                                        _c("span", [
                                           _vm._v(_vm._s(option.label)),
                                         ]),
                                         _vm._v(" "),
@@ -1120,7 +1134,10 @@ var render = function () {
                                       [
                                         _vm.loading
                                           ? _c("loading-graphic", {
-                                              attrs: { inline: true },
+                                              attrs: {
+                                                inline: true,
+                                                text: "Searching…",
+                                              },
                                             })
                                           : _vm._e(),
                                       ],
@@ -1150,7 +1167,7 @@ var render = function () {
                         ],
                         null,
                         false,
-                        1903376315
+                        52952055
                       ),
                     })
                   : _vm._e(),

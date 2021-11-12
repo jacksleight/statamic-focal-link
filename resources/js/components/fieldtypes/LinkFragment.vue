@@ -28,24 +28,24 @@
                     v-if="!queryTemplate"
                     ref="query"
                     class="flex-1"
+                    placeholder="query"
                     :value="queryValue"
                     :reduce="option => option.value"
                     :create-option="value => ({ value, label: value, title: null })"
                     :clearable="true"
                     :options="queryOptions"
-                    :placeholder="loading ? '◉ loading…' : 'query'"
                     :searchable="true"
                     :taggable="true"
                     :close-on-select="true"
                     @input="queryChanged"
                     @open="selectOpen">
                     <template #option="option">
-                        <div class="flex items-center" v-if="!option.loading">
-                            <span class="flex-1">{{ option.label }}</span>
+                        <div :class="!bothEnabled ? 'flex flex-wrap justify-between' : 'flex flex-col'" v-if="!option.loading">
+                            <span>{{ option.label }}</span>
                             <strong>{{ option.title }}</strong>
                         </div>
                         <div v-if="option.loading">
-                            <loading-graphic v-if="loading" :inline="true" />
+                            <loading-graphic v-if="loading" :inline="true" text="Searching…" />
                         </div>
                     </template>
                     <template #no-options>
@@ -75,24 +75,24 @@
                     v-if="!fragmentTemplate"
                     ref="fragment"
                     class="flex-1"
+                    placeholder="fragment"
                     :value="fragmentValue"
                     :reduce="option => option.value"
                     :create-option="value => ({ value, label: value, title: null })"
                     :clearable="true"
                     :options="fragmentOptions"
-                    :placeholder="loading ? '◉ loading…' : 'fragment'"
                     :searchable="true"
                     :taggable="true"
                     :close-on-select="true"
                     @input="fragmentChanged"
                     @open="selectOpen">
                     <template #option="option">
-                        <div class="flex items-center" v-if="!option.loading">
-                            <span class="flex-1">{{ option.label }}</span>
+                        <div :class="!bothEnabled ? 'flex flex-wrap justify-between' : 'flex flex-col'" v-if="!option.loading">
+                            <span>{{ option.label }}</span>
                             <strong>{{ option.title }}</strong>
                         </div>
                         <div v-if="option.loading">
-                            <loading-graphic v-if="loading" :inline="true" />
+                            <loading-graphic v-if="loading" :inline="true" text="Searching…" />
                         </div>
                     </template>
                     <template #no-options>
@@ -206,6 +206,10 @@ export default {
 
         fragmentEnabled() {
             return this.linkSpec && typeof this.linkSpec.fragments === 'object';
+        },
+
+        bothEnabled() {
+            return this.queryEnabled && this.fragmentEnabled;
         },
 
         linkSpecPending() {
@@ -375,4 +379,5 @@ export default {
 .sfl-input .input-text {
     padding-left: 20px !important;
 }
+
 </style>

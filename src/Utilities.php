@@ -10,12 +10,12 @@ class Utilities
 {   
     protected $presets;
 
-    protected $classes;
+    protected $links;
 
-    public function __construct($presets, $classes)
+    public function __construct($presets, $links)
     {
         $this->presets = collect($presets);
-        $this->classes = collect($classes);
+        $this->links   = collect($links);
     }
 
     public function getSpec($value)
@@ -31,21 +31,21 @@ class Utilities
             'discovered' => false,
         ];
 
-        $filter = function ($data, $format) use ($value) {
-            if (Str::startsWith($format, 'https://')) {
-                $format = 'http://' . Str::after($format, 'https://');
+        $filter = function ($link, $pattern) use ($value) {
+            if (Str::startsWith($pattern, 'https://')) {
+                $pattern = 'http://' . Str::after($pattern, 'https://');
             }
-            return Str::is($format, $value);
+            return Str::is($pattern, $value);
         };
 
         collect()
             ->merge($this->presets->filter($filter)->values())
-            ->merge($this->classes->filter($filter)->values())
-            ->each(function ($data) use (&$spec) {
-                if (!is_array($data)) {
+            ->merge($this->links->filter($filter)->values())
+            ->each(function ($link) use (&$spec) {
+                if (!is_array($link)) {
                     return;
                 }
-                foreach ($data as $key => $list) {
+                foreach ($link as $key => $list) {
                     if (!isset($spec[$key])) {
                         return;
                     }

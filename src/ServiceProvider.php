@@ -29,9 +29,9 @@ class ServiceProvider extends AddonServiceProvider
         );
 
         $this->app->singleton(Utilities::class, function () {
-            $presets = require_once __DIR__.'/../data/presets.php';
-            $classes = config('statamic.link_fragment_fieldtype.classes');
-            return new Utilities($presets, $classes);
+            $presets = require_once __DIR__.'/../resources/presets/presets.php';
+            $config = config('statamic.link_fragment_fieldtype');
+            return new Utilities($presets['links'], $config['links']);
         });
         $this->app->singleton(Scanner::class, function () {
             return new Scanner();

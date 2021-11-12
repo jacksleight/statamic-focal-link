@@ -32,9 +32,7 @@ class Scanner
 
             $spec['fragments'] += $this->findFragments($html, $spec);
 
-        } catch (Exception $e) {
-            throw $e;
-        }
+        } catch (Exception $e) {}
 
         $spec['discovered'] = true;
 
@@ -87,7 +85,7 @@ class Scanner
                 $targetNode = $node instanceof DOMElement
                     ? $node->getAttributeNode('id')
                     : $node;
-                $value = trim($targetNode->textContent);
+                $value = trim($targetNode->textContent, "\n\r\t\v\0#");
                 $label = Str::headline($value);
 
                 if (is_string($labelQuery)) {

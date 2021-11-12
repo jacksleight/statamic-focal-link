@@ -20,94 +20,75 @@ composer require jacksleight/statamic-focal-link
 
 ## Configuration
 
-You can configure which options are avaliable for each link class by publishing the config:
+You can configure which options are avaliable for each type of link by publishing the config:
 
 ```bash
 php please vendor:publish --tag=statamic-focal-link-config
 ```
 
-And then opening `config/statamic/focal_link.php`.
+And then opening `config/statamic/focal_link.php` and editing the `links` list.
 
-Each key in the confguration relates to a specific link class. Entry links are defined with an `entry::[collection]/[blueprint]` key, URL link keys are the full URL up to the end of the path. You can use asterisks to perform wildcard matches.
+### Link Matching Patterns
 
-Query and fragment options can either be a fixed value or a template value. Templates must contain the string `{{}}`, which is where the cursor will be placed when the template is selected.
+Each key in the list should be a pattern that matches a type of link:
 
-You can enable automatic ID discovery by setting the `discover` option.
+* Entry links use the pattern `entry::[collection]/[blueprint]`
+* URL links use the full URL up to the end of the path
+    * `https` will be mapped to `http` automatically
 
-Here is an example and description of all avaliable settings:
+You can use asterisks in the pattern to perform wildcard matches.
+
+### Query & Fragment Options
+
+Options can either be a fixed value or a template value. Templates must contain the string `{{ [placeholder] }}`, this where the cursor will be placed when the template is selected.
+
+### Fragment Identifier Discovery
+
+You can enable automatic ID discovery by setting the `discovery` option to an array of XPath expressions, these will be used to find matching elements in the destination page.
+
+The keys should be the path to the elements containg the ID attribute, the values should be the path to the node that contains the label, relative to the element. If you set the value to `true` the ID will be converted to a label.
+
+### Example Configuration
+
+Here is an example and description of the avaliable options:
 
 ```php
 /*
-The link class key
+The link pattern
 */
-'entry::products/*' => [
+'entry::products/*' => [ // All blueprints within the products collection
 
     /*
     The query string options
-    Set to false to remove the query field entriely
     */
     'queries' => [
-        'size=large' => 'Size — Large' // A fixed option
-        'size={{}}'  => 'Size' // A template option
+        'size=large'      => 'Size — Large' // A fixed option
+        'size={{ size }}' => 'Size' // A template option
     ],
 
     /*
     The fragment itentifier options
-    Set to false to remove the fragment field entriely
     */
     'fragments' => [
-        'reviews'      => 'Reviews' // A fixed option
-        ':~:text={{}}' => 'Text Fragment', // A template option
+        'reviews'            => 'Reviews' // A fixed option
+        ':~:text={{ text }}' => 'Text Fragment', // A template option
     ],
 
     /*
-    ID discovery settings
-    Set to true or an array to enable
+    Fragment identifier discovery options
     */
-    'discover' => [
-
-        /*
-        Only look within this element for IDs
-        Defaults to document body. Must be ether:
-          - An ID selector
-          - An XPath expression e.g. `//div[@id="content"]` (must start with a slash)
-        */
-        'within' => '#content',
-
-        /*
-        Exclude these IDs from the list
-        */
-        'except' => [
-            'table-of-contents'
-        ],
-
-        /*
-        A regex used to match the IDs
-        For special cases this can also alter the IDs, see the GitHub preset 
-        */
-        'regex' => '^main-',
-
-        /*
-        Where to look for option labels
-        If both are set and the attribute exists it will override the content value
-        */
-        'labels' => [
-            'attribute' => 'title', // Read an attribute from the element
-            'content'   => true, // Read the content of the element
-            'parent'    => false, // Read the parent instead
-        ],
-
+    'discovery' => [
+        "//*[@id]" => "text()", // Match all elements with an ID and use the text content as a label
     ],
 
 ],
 ```
 
-Check the included presets for more examples.
+You can look through the included presets for more examples.
 
 ## Fieldtype Options
 
 * **collections:** The collections that should be linkable
-* **scan_urls:** Whether to enable scanning of URLs (off by default)
 
 ## Popular Site Presets
 
