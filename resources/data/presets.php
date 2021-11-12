@@ -10,13 +10,13 @@ return [
 
     'http://statamic.dev/*' => [
         'discovery' => [
-            "//*[@id='content']//*[self::h2 or self::h3][@id]" => "text()",
+            "//*[@id='content']//*[@id]" => "text()",
         ],
     ],
 
     'https://laravel.com/docs/*' => [
         'discovery' => [
-            "//*[@id='main-content']//*[self::h2 or self::h3][@id]" => "text()",
+            "//*[@id='main-content']//*[not(self::script)][@id]" => "text()",
         ],
     ],
 
