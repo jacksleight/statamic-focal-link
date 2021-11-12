@@ -118,7 +118,7 @@
 
 <script>
 
-const templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
+const templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
 
 export default {
 
@@ -127,7 +127,7 @@ export default {
     data() {
 
         return {
-            linkSpec: this.meta.linkSpec,
+            spec: this.meta.spec,
             linkValue: this.meta.initialLink,
             queryValue: this.meta.initialQuery,
             fragmentValue: this.meta.initialFragment,
@@ -167,10 +167,7 @@ export default {
         },
 
         queryOptions() {       
-            if (!this.queryEnabled) {
-                return {};
-            }
-            const options = this.prepareOptions(this.linkSpec.queries);
+            const options = this.prepareOptions(this.spec.queries || {});
             if (this.loading) {
                 options.push({
                     value: '__loading__',
@@ -183,11 +180,8 @@ export default {
             return options;
         },
 
-        fragmentOptions() {            
-            if (!this.fragmentEnabled) {
-                return {};
-            }
-            const options = this.prepareOptions(this.linkSpec.fragments);
+        fragmentOptions() {  
+            const options = this.prepareOptions(this.spec.fragments || {});
             if (this.loading) {
                 options.push({
                     value: '__loading__',
@@ -201,19 +195,19 @@ export default {
         },
 
         queryEnabled() {
-            return this.linkSpec && typeof this.linkSpec.queries === 'object';
+            return this.spec && this.spec.queries;
         },
 
         fragmentEnabled() {
-            return this.linkSpec && typeof this.linkSpec.fragments === 'object';
+            return this.spec && (this.spec.fragments || this.spec.discovery);
         },
 
         bothEnabled() {
             return this.queryEnabled && this.fragmentEnabled;
         },
 
-        linkSpecPending() {
-            return !this.linkSpec || (typeof this.linkSpec.discovery === 'object' && !this.linkSpec.discovered);
+        discoveryPending() {
+            return !this.spec || (this.spec.discovery && !this.spec.discovered);
         },
 
     },
@@ -226,7 +220,7 @@ export default {
             this.fragmentValue = null;
             this.queryTemplate = null;
             this.fragmentTemplate = null;
-            this.linkSpec = null;
+            this.spec = null;
             this.update(this.returnValue);
             this.linkChangedDebounced();
         },
@@ -242,7 +236,7 @@ export default {
                 }
             }
             this.$nextTick(() => {
-                return this.fetchLinkSpec();
+                return this.fetchSpec();
             });
         }, 300),
 
@@ -285,10 +279,14 @@ export default {
             if (match === null) {
                 return;
             }
-            return [ value, () => {
+            const parsed =
+                value.substr(0, match.index) +
+                match[1] +
+                value.substr(match.index + match[0].length);
+            return [ parsed, () => {
                 const el = this.$refs[`${type}_template`].$refs.input;
                 el.focus();
-                el.setSelectionRange(match.index, match.index + match[0].length);
+                el.setSelectionRange(match.index, match.index + match[1].length);
             } ];
         },
 
@@ -311,30 +309,29 @@ export default {
         },
 
         selectOpen() {
-            if (this.linkSpecPending) {
-                this.fetchLinkSpec(true);
+            if (this.discoveryPending) {
+                this.fetchSpec(true);
             }
         },
 
-        fetchLinkSpec(discover = false) {            
-            const { specCache, discoverCache } = window.StatamicLinkFragmentFieldtype;
+        fetchSpec(discover = false) {            
+            const { specCache, discoverCache } = window.StatamicFocalLink;
             const cache = discover ? discoverCache : specCache;
             const value = this.linkValue;
             if (value === null) {
                 return;
             }
             if (cache[value]) {
-                this.linkSpec = cache[value];
+                this.spec = cache[value];
                 return;
             }
             this.loading = true;
-            this.$axios.get(cp_url('fieldtypes/focal_link/spec'), {
+            this.$axios.get(cp_url('focal-link/spec'), {
                 params: { value, discover },
             }).then(response => {
-                this.linkSpec = response.data;
-                cache[value] = this.linkSpec;
+                this.spec = response.data;
+                cache[value] = this.spec;
             }).catch(e => {
-                this.linkSpec = null;
             }).finally(e => {
                 this.loading = false;
             })
@@ -342,7 +339,6 @@ export default {
 
         prepareOptions(options) {
             return Object.entries(options)
-                .filter(([ value, label ]) => label)
                 .map(([ value, label ]) => {
                     if (this.isTemplate(value)) {
                         label = `${label}…`;
@@ -350,7 +346,7 @@ export default {
                     label = label.length > 80
                         ? `${label.substr(0, 80)}…`
                         : label;
-                    return { 
+                    return {
                         value: value,
                         label: value,
                         title: label,
@@ -379,5 +375,4 @@ export default {
 .sfl-input .input-text {
     padding-left: 20px !important;
 }
-
 </style>

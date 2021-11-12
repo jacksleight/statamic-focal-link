@@ -1,10 +1,10 @@
 <?php
 
-namespace JackSleight\StatamicLinkFragmentFieldtype;
+namespace JackSleight\StatamicFocalLink;
 
 use Statamic\Providers\AddonServiceProvider;
-use JackSleight\StatamicLinkFragmentFieldtype\Scanner;
-use JackSleight\StatamicLinkFragmentFieldtype\Utilities;
+use JackSleight\StatamicFocalLink\Scanner;
+use JackSleight\StatamicFocalLink\Utilities;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -17,7 +17,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $fieldtypes = [
-        \JackSleight\StatamicLinkFragmentFieldtype\Fieldtypes\LinkFragment::class,
+        \JackSleight\StatamicFocalLink\Fieldtypes\FocalLinkFieldtype::class,
     ];
 
     public function register()
@@ -25,13 +25,12 @@ class ServiceProvider extends AddonServiceProvider
         parent::register();
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/statamic/link_fragment_fieldtype.php', 'statamic.link_fragment_fieldtype',
+            __DIR__ . '/../config/statamic/focal_link.php', 'statamic.focal_link',
         );
 
         $this->app->singleton(Utilities::class, function () {
-            $presets = require_once __DIR__.'/../resources/presets/presets.php';
-            $config = config('statamic.link_fragment_fieldtype');
-            return new Utilities($presets['links'], $config['links']);
+            $presets = require_once __DIR__.'/../resources/data/presets.php';
+            return new Utilities($presets, config('statamic.focal_link.links'));
         });
         $this->app->singleton(Scanner::class, function () {
             return new Scanner();
@@ -43,7 +42,7 @@ class ServiceProvider extends AddonServiceProvider
         parent::boot();
 
         $this->publishes([
-            __DIR__ . '/../config/statamic/link_fragment_fieldtype.php' => config_path('statamic/link_fragment_fieldtype.php'),
-        ], 'statamic-link-fragment-fieldtype-config');
+            __DIR__ . '/../config/statamic/focal_link.php' => config_path('statamic/focal_link.php'),
+        ], 'statamic-focal-link-config');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace JackSleight\StatamicLinkFragmentFieldtype;
+namespace JackSleight\StatamicFocalLink;
 
 use DOMAttr;
 use DOMDocument;
@@ -14,25 +14,24 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class Scanner
 {
-    public function scan($type, $raw, $spec)
+    public function scan($link, $spec)
     {
-        if (!is_array($spec['discovery']) || !is_array($spec['fragments'])) {
+        if (!isset($link) || !is_array($spec['discovery'])) {
             return $spec;
         }
-
-        try {
             
-            $html = null;
+        $html = null;
 
-            if ($type === 'entry') {
-                $html = $this->fetchEntryHtml($raw);
-            } else if ($type === 'url') {
-                $html = $this->fetchUrlHtml($raw);
-            }
+        if ($link['kind'] === 'entry') {
+            $html = $this->fetchEntryHtml($link['id']);
+        } else if ($link['kind'] === 'url') {
+            $html = $this->fetchUrlHtml($link['value']);
+        }
 
-            $spec['fragments'] += $this->findFragments($html, $spec);
-
-        } catch (Exception $e) {}
+        $spec['fragments'] = array_merge(
+            $spec['fragments'] ?? [],
+            $this->findFragments($html, $spec)
+        );
 
         $spec['discovered'] = true;
 
@@ -108,6 +107,6 @@ class Scanner
 
         }
 
-        return $fragments->sortKeys()->all();
+        return $fragments->all();
     }
 }

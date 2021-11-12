@@ -1,12 +1,12 @@
 <?php
 
-namespace JackSleight\StatamicLinkFragmentFieldtype\Http\Controllers\CP;
+namespace JackSleight\StatamicFocalLink\Http\Controllers\CP;
 
 use Str;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
-use JackSleight\StatamicLinkFragmentFieldtype\Facades\Utilities;
-use JackSleight\StatamicLinkFragmentFieldtype\Facades\Scanner;
+use JackSleight\StatamicFocalLink\Facades\Utilities;
+use JackSleight\StatamicFocalLink\Facades\Scanner;
 
 class Controller extends CpController
 {
@@ -15,22 +15,13 @@ class Controller extends CpController
         $value    = $request->value;
         $discover = $request->discover === 'true';
 
-        list(
-            $linkValue
-        ) = Utilities::parseValue($value);
+        $link = Utilities::parseLink($value, true);
+        $spec = Utilities::getSpec($link);
 
-        list(
-            $linkType,
-            $linkClass,
-            $linkRaw,
-        ) = Utilities::parseLink($linkValue);
-
-        $linkSpec = Utilities::getSpec($linkClass);
-
-        if ($discover && $linkSpec) {
-            $linkSpec = Scanner::scan($linkType, $linkRaw, $linkSpec);
+        if ($discover && $spec) {
+            $spec = Scanner::scan($link, $spec);
         }
 
-        return $linkSpec;
+        return $spec;
     }
 }

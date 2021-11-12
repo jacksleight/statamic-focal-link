@@ -1,3 +1,3 @@
 <?php
 
-Route::get('fieldtypes/focal_link/spec', 'CP\Controller@spec');
+Route::get('focal-link/spec', 'CP\Controller@spec');

@@ -1,6 +1,6 @@
 <?php
 
-namespace JackSleight\StatamicLinkFragmentFieldtype\Facades;
+namespace JackSleight\StatamicFocalLink\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -8,6 +8,6 @@ class Utilities extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \JackSleight\StatamicLinkFragmentFieldtype\Utilities::class;
+        return \JackSleight\StatamicFocalLink\Utilities::class;
     }
 }

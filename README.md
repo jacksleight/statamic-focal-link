@@ -33,8 +33,7 @@ And then opening `config/statamic/focal_link.php` and editing the `links` list.
 Each key in the list should be a pattern that matches a type of link:
 
 * Entry links use the pattern `entry::[collection]/[blueprint]`
-* URL links use the full URL up to the end of the path
-    * `https` will be mapped to `http` automatically
+* URL links use the full URL up to the end of the path (`https` will be mapped to `http` automatically)
 
 You can use asterisks in the pattern to perform wildcard matches.
 
@@ -46,11 +45,9 @@ Options can either be a fixed value or a template value. Templates must contain 
 
 You can enable automatic ID discovery by setting the `discovery` option to an array of XPath expressions, these will be used to find matching elements in the destination page.
 
-The keys should be the path to the elements containg the ID attribute, the values should be the path to the node that contains the label, relative to the element. If you set the value to `true` the ID will be converted to a label.
+The array keys should be the path to the elements containing the ID attribute, the values should be the path to the node that contains the label, relative to the element. If you set the value to `true` a label will be generated from the ID using `Str::headline()`.
 
 ### Example Configuration
-
-Here is an example and description of the avaliable options:
 
 ```php
 /*
@@ -59,46 +56,36 @@ The link pattern
 'entry::products/*' => [ // All blueprints within the products collection
 
     /*
-    The query string options
+    Query string options
     */
     'queries' => [
-        'size=large'      => 'Size — Large' // A fixed option
-        'size={{ size }}' => 'Size' // A template option
+        "size=large"      => "Size — Large" // A fixed option
+        "size={{ size }}" => "Size" // A template option
     ],
 
     /*
-    The fragment itentifier options
+    Fragment itentifier options
     */
     'fragments' => [
-        'reviews'            => 'Reviews' // A fixed option
-        ':~:text={{ text }}' => 'Text Fragment', // A template option
+        "reviews"            => "Reviews" // A fixed option
+        ":~:text={{ text }}" => "Text Fragment", // A template option
     ],
 
     /*
     Fragment identifier discovery options
     */
     'discovery' => [
-        "//*[@id]" => "text()", // Match all elements with an ID and use the text content as a label
+        "//*[@id]" => "text()", // Match all elements with an ID attribute and use the text content as a label
     ],
 
 ],
 ```
 
-You can look through the included presets for more examples.
+Check out the [included presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for more examples.
 
 ## Fieldtype Options
 
 * **collections:** The collections that should be linkable
-
-## Popular Site Presets
-
-The addon comes with a handful of presets for common formats and popular sites. You can override these in your own confguration if you need to. I would like to grow this list so if you know of others and would like them added feel free to submit an issue or PR.
-
-## Link Fieldtype Compatibility
-
-I’ve tried to make this fieldtype work as seamlessly as possible with the built-in Link fieldtype. Depending on the link this either stores values in an identical format or a suffixed format.
-
-Any Link field can be changed to a Focal Link field and the values will be compatible. If you change a Focal Link field back to a Link field Entry values with a query or fragment set will not be compatible unless the suffixes are removed.
 
 ## Automatic Heading IDs 
 
@@ -112,3 +99,13 @@ Mutator::tag('heading', function ($tag, $data) {
     return $tag;
 });
 ```
+
+## Common Format & Popular Site Presets
+
+The addon comes with a handful of presets for common formats and popular sites. I would like to grow this list so if you know of others and would like them added feel free to submit an issue or PR.
+
+## Link Fieldtype Compatibility
+
+I’ve tried to make this fieldtype work as seamlessly as possible with the built-in Link fieldtype. Depending on the link this either stores values in an identical format or a suffixed format.
+
+Any Link field can be changed to a Focal Link field and the values will be compatible. If you change a Focal Link field back to a Link field Entry values with a query or fragment set will not be compatible, the suffixes will need to be removed.

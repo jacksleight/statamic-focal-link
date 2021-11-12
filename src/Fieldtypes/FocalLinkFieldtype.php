@@ -1,19 +1,19 @@
 <?php
 
-namespace JackSleight\StatamicLinkFragmentFieldtype\Fieldtypes;
+namespace JackSleight\StatamicFocalLink\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Field;
 use Facades\Statamic\Routing\ResolveRedirect;
-use JackSleight\StatamicLinkFragmentFieldtype\Facades\Utilities;
+use JackSleight\StatamicFocalLink\Facades\Utilities;
 
-class LinkFragment extends Fieldtype
+class FocalLinkFieldtype extends Fieldtype
 {
     protected $icon = 'link';
 
     public static function title()
     {
-        return __('Link Fragment');
+        return __('Focal Link');
     }
 
     protected function configFieldItems(): array
@@ -30,23 +30,25 @@ class LinkFragment extends Fieldtype
 
     public function augment($value)
     {
-        list(
-            $linkValue,
-            $queryValue,
-            $fragmentValue,
-        ) = Utilities::parseValue($value);
+        if (!isset($link)) {
+            return;
+        }
         
-        $redirect = ResolveRedirect::resolve($linkValue, $this->field->parent());
+        $link = Utilities::parseLink($value);
+        
+        $redirect = ResolveRedirect::resolve($link['link'], $this->field->parent());
 
         if ($redirect === 404) {
             return null;
         }
 
-        if (isset($queryValue)) {
-            $redirect .= "?{$queryValue}";
-        }
-        if (isset($fragmentValue)) {
-            $redirect .= "#{$fragmentValue}";
+        if ($link['kind'] === 'entry') {
+            if (isset($link['query'])) {
+                $redirect .= "?{$link['query']}";
+            }
+            if (isset($link['fragment'])) {
+                $redirect .= "#{$link['fragment']}";
+            }
         }
 
         return $redirect;
@@ -56,25 +58,16 @@ class LinkFragment extends Fieldtype
     {
         $value = $this->field->value();
 
-        list(
-            $linkValue,
-            $queryValue,
-            $fragmentValue,
-        ) = Utilities::parseValue($value);
+        $link = Utilities::parseLink($value, true);
+        $spec = Utilities::getSpec($link);
 
-        list(
-            $linkType,
-            $linkClass,
-        ) = Utilities::parseLink($linkValue);
-
-        $linkFieldtype = $this->nestedLinkFieldtype($linkValue);
-        $linkSpec = Utilities::getSpec($linkClass);
+        $linkFieldtype = $this->nestedLinkFieldtype($link['link']);
 
         return [
-            'initialLink' => $linkValue,
-            'initialQuery' => $queryValue,
-            'initialFragment' => $fragmentValue,
-            'linkSpec' => $linkSpec,
+            'initialLink' => $link['link'],
+            'initialQuery' => $link['query'],
+            'initialFragment' => $link['fragment'],
+            'spec' => $spec,
             'link' => [
                 'config' => $linkFieldtype->config(),
                 'meta' => $linkFieldtype->preload(),

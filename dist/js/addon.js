@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=script&lang=js&":
-/*!******************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=script&lang=js& ***!
-  \******************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -24,8 +24,6 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 //
 //
 //
@@ -144,12 +142,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 //
 //
 //
-var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
+var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
   data: function data() {
     return {
-      linkSpec: this.meta.linkSpec,
+      spec: this.meta.spec,
       linkValue: this.meta.initialLink,
       queryValue: this.meta.initialQuery,
       fragmentValue: this.meta.initialFragment,
@@ -185,11 +183,7 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
       return value.toString();
     },
     queryOptions: function queryOptions() {
-      if (!this.queryEnabled) {
-        return {};
-      }
-
-      var options = this.prepareOptions(this.linkSpec.queries);
+      var options = this.prepareOptions(this.spec.queries || {});
 
       if (this.loading) {
         options.push({
@@ -204,11 +198,7 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
       return options;
     },
     fragmentOptions: function fragmentOptions() {
-      if (!this.fragmentEnabled) {
-        return {};
-      }
-
-      var options = this.prepareOptions(this.linkSpec.fragments);
+      var options = this.prepareOptions(this.spec.fragments || {});
 
       if (this.loading) {
         options.push({
@@ -223,16 +213,16 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
       return options;
     },
     queryEnabled: function queryEnabled() {
-      return this.linkSpec && _typeof(this.linkSpec.queries) === 'object';
+      return this.spec && this.spec.queries;
     },
     fragmentEnabled: function fragmentEnabled() {
-      return this.linkSpec && _typeof(this.linkSpec.fragments) === 'object';
+      return this.spec && (this.spec.fragments || this.spec.discovery);
     },
     bothEnabled: function bothEnabled() {
       return this.queryEnabled && this.fragmentEnabled;
     },
-    linkSpecPending: function linkSpecPending() {
-      return !this.linkSpec || _typeof(this.linkSpec.discovery) === 'object' && !this.linkSpec.discovered;
+    discoveryPending: function discoveryPending() {
+      return !this.spec || this.spec.discovery && !this.spec.discovered;
     }
   },
   methods: {
@@ -242,7 +232,7 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
       this.fragmentValue = null;
       this.queryTemplate = null;
       this.fragmentTemplate = null;
-      this.linkSpec = null;
+      this.spec = null;
       this.update(this.returnValue);
       this.linkChangedDebounced();
     },
@@ -262,7 +252,7 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
       }
 
       this.$nextTick(function () {
-        return _this.fetchLinkSpec();
+        return _this.fetchSpec();
       });
     }, 300),
     queryChanged: function queryChanged(query) {
@@ -315,11 +305,12 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
         return;
       }
 
-      return [value, function () {
+      var parsed = value.substr(0, match.index) + match[1] + value.substr(match.index + match[0].length);
+      return [parsed, function () {
         var el = _this2.$refs["".concat(type, "_template")].$refs.input;
 
         el.focus();
-        el.setSelectionRange(match.index, match.index + match[0].length);
+        el.setSelectionRange(match.index, match.index + match[1].length);
       }];
     },
     queryTemplateCommit: function queryTemplateCommit() {
@@ -341,17 +332,17 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
       this.update(this.returnValue);
     },
     selectOpen: function selectOpen() {
-      if (this.linkSpecPending) {
-        this.fetchLinkSpec(true);
+      if (this.discoveryPending) {
+        this.fetchSpec(true);
       }
     },
-    fetchLinkSpec: function fetchLinkSpec() {
+    fetchSpec: function fetchSpec() {
       var _this3 = this;
 
       var discover = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var _window$StatamicLinkF = window.StatamicLinkFragmentFieldtype,
-          specCache = _window$StatamicLinkF.specCache,
-          discoverCache = _window$StatamicLinkF.discoverCache;
+      var _window$StatamicFocal = window.StatamicFocalLink,
+          specCache = _window$StatamicFocal.specCache,
+          discoverCache = _window$StatamicFocal.discoverCache;
       var cache = discover ? discoverCache : specCache;
       var value = this.linkValue;
 
@@ -360,38 +351,30 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
       }
 
       if (cache[value]) {
-        this.linkSpec = cache[value];
+        this.spec = cache[value];
         return;
       }
 
       this.loading = true;
-      this.$axios.get(cp_url('fieldtypes/focal_link/spec'), {
+      this.$axios.get(cp_url('focal-link/spec'), {
         params: {
           value: value,
           discover: discover
         }
       }).then(function (response) {
-        _this3.linkSpec = response.data;
-        cache[value] = _this3.linkSpec;
-      })["catch"](function (e) {
-        _this3.linkSpec = null;
-      })["finally"](function (e) {
+        _this3.spec = response.data;
+        cache[value] = _this3.spec;
+      })["catch"](function (e) {})["finally"](function (e) {
         _this3.loading = false;
       });
     },
     prepareOptions: function prepareOptions(options) {
       var _this4 = this;
 
-      return Object.entries(options).filter(function (_ref) {
+      return Object.entries(options).map(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             value = _ref2[0],
             label = _ref2[1];
-
-        return label;
-      }).map(function (_ref3) {
-        var _ref4 = _slicedToArray(_ref3, 2),
-            value = _ref4[0],
-            label = _ref4[1];
 
         if (_this4.isTemplate(value)) {
           label = "".concat(label, "\u2026");
@@ -411,10 +394,10 @@ var templatePattern = /\{\{[a-z0-9 ]*\}\}/i;
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css&":
-/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css& ***!
-  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -427,7 +410,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text {\n    padding-left: 20px !important;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text {\n    padding-left: 20px !important;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -509,10 +492,10 @@ module.exports = function (cssWithMappingToString) {
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css&":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css& ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css&":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css& ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -521,7 +504,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LinkFragment.vue?vue&type=style&index=0&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css&");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css&");
 
             
 
@@ -530,11 +513,11 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -816,19 +799,19 @@ module.exports = function (list, options) {
 
 /***/ }),
 
-/***/ "./resources/js/components/Fieldtypes/LinkFragment.vue":
-/*!*************************************************************!*\
-  !*** ./resources/js/components/Fieldtypes/LinkFragment.vue ***!
-  \*************************************************************/
+/***/ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue":
+/*!*******************************************************************!*\
+  !*** ./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue ***!
+  \*******************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _LinkFragment_vue_vue_type_template_id_781adf3f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LinkFragment.vue?vue&type=template&id=781adf3f& */ "./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=template&id=781adf3f&");
-/* harmony import */ var _LinkFragment_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LinkFragment.vue?vue&type=script&lang=js& */ "./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=script&lang=js&");
-/* harmony import */ var _LinkFragment_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./LinkFragment.vue?vue&type=style&index=0&lang=css& */ "./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css&");
+/* harmony import */ var _FocalLinkFieldtype_vue_vue_type_template_id_b9ce8cec___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec& */ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec&");
+/* harmony import */ var _FocalLinkFieldtype_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FocalLinkFieldtype.vue?vue&type=script&lang=js& */ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=script&lang=js&");
+/* harmony import */ var _FocalLinkFieldtype_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css& */ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -839,9 +822,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
-  _LinkFragment_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _LinkFragment_vue_vue_type_template_id_781adf3f___WEBPACK_IMPORTED_MODULE_0__.render,
-  _LinkFragment_vue_vue_type_template_id_781adf3f___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _FocalLinkFieldtype_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _FocalLinkFieldtype_vue_vue_type_template_id_b9ce8cec___WEBPACK_IMPORTED_MODULE_0__.render,
+  _FocalLinkFieldtype_vue_vue_type_template_id_b9ce8cec___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
   null,
@@ -851,58 +834,58 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/Fieldtypes/LinkFragment.vue"
+component.options.__file = "resources/js/components/Fieldtypes/FocalLinkFieldtype.vue"
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=script&lang=js&":
-/*!**************************************************************************************!*\
-  !*** ./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=script&lang=js& ***!
-  \**************************************************************************************/
+/***/ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LinkFragment.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=script&lang=js&");
- /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./FocalLinkFieldtype.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css&":
-/*!**********************************************************************************************!*\
-  !*** ./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css& ***!
-  \**********************************************************************************************/
+/***/ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css&":
+/*!****************************************************************************************************!*\
+  !*** ./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css& ***!
+  \****************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LinkFragment.vue?vue&type=style&index=0&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=style&index=0&lang=css&");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=style&index=0&lang=css&");
 
 
 /***/ }),
 
-/***/ "./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=template&id=781adf3f&":
-/*!********************************************************************************************!*\
-  !*** ./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=template&id=781adf3f& ***!
-  \********************************************************************************************/
+/***/ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec&":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec& ***!
+  \**************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_template_id_781adf3f___WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_template_id_781adf3f___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_template_id_b9ce8cec___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_template_id_b9ce8cec___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LinkFragment_vue_vue_type_template_id_781adf3f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LinkFragment.vue?vue&type=template&id=781adf3f& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=template&id=781adf3f&");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FocalLinkFieldtype_vue_vue_type_template_id_b9ce8cec___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec&");
 
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=template&id=781adf3f&":
-/*!***********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/LinkFragment.vue?vue&type=template&id=781adf3f& ***!
-  \***********************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec&":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue?vue&type=template&id=b9ce8cec& ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1410,14 +1393,14 @@ var __webpack_exports__ = {};
   !*** ./resources/js/addon.js ***!
   \*******************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_Fieldtypes_LinkFragment_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Fieldtypes/LinkFragment.vue */ "./resources/js/components/Fieldtypes/LinkFragment.vue");
+/* harmony import */ var _components_Fieldtypes_FocalLinkFieldtype_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Fieldtypes/FocalLinkFieldtype.vue */ "./resources/js/components/Fieldtypes/FocalLinkFieldtype.vue");
 
-window.StatamicLinkFragmentFieldtype = {
+window.StatamicFocalLink = {
   specCache: {},
   discoverCache: {}
 };
 Statamic.booting(function () {
-  Statamic.$components.register('link_fragment-fieldtype', _components_Fieldtypes_LinkFragment_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
+  Statamic.$components.register('focal_link-fieldtype', _components_Fieldtypes_FocalLinkFieldtype_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
 });
 })();
 

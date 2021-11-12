@@ -1,6 +1,6 @@
 <?php
 
-namespace JackSleight\StatamicLinkFragmentFieldtype;
+namespace JackSleight\StatamicFocalLink;
 
 use Exception;
 use Str;
@@ -18,37 +18,34 @@ class Utilities
         $this->links   = collect($links);
     }
 
-    public function getSpec($value)
+    public function getSpec($link)
     {
-        if (!isset($value)) {
+        if (!isset($link)) {
             return;
         }
 
         $spec = [
-            'queries'    => false,
-            'fragments'  => false,
-            'discovery'  => false,
+            'queries'    => null,
+            'fragments'  => null,
+            'discovery'  => null,
             'discovered' => false,
         ];
 
-        $filter = function ($link, $pattern) use ($value) {
+        $filter = function ($config, $pattern) use ($link) {
             if (Str::startsWith($pattern, 'https://')) {
                 $pattern = 'http://' . Str::after($pattern, 'https://');
             }
-            return Str::is($pattern, $value);
+            return Str::is($pattern, $link['type']);
         };
 
         collect()
             ->merge($this->presets->filter($filter)->values())
             ->merge($this->links->filter($filter)->values())
-            ->each(function ($link) use (&$spec) {
-                if (!is_array($link)) {
+            ->each(function ($config) use (&$spec) {
+                if (!is_array($config)) {
                     return;
                 }
-                foreach ($link as $key => $list) {
-                    if (!isset($spec[$key])) {
-                        return;
-                    }
+                foreach ($config as $key => $list) {
                     if (is_array($spec[$key]) && is_array($list)) {
                         $spec[$key] = array_merge($spec[$key], $list);
                     } else {
@@ -60,66 +57,65 @@ class Utilities
         return $spec;
     }
 
-    public function parseValue($value)
+    public function parseLink($value, $includeType = false)
     {
-        $linkValue     = null;
-        $queryValue    = null;
-        $fragmentValue = null;
-
-        if (isset($value)) {
-
-            $url = parse_url($value);
-            
-            if (isset($url['query'])) {
-                $linkValue = Str::before($value, '?');
-            } else if (isset($url['fragment'])) {
-                $linkValue = Str::before($value, '#');
-            } else {
-                $linkValue = $value;
-            }
-            $queryValue    = $url['query'] ?? null;
-            $fragmentValue = $url['fragment'] ?? null;
-            
+        if (!isset($value)) {
+            return;
         }
-        
-        return [
-            $linkValue,
-            $queryValue,
-            $fragmentValue,
-        ];
-    }
 
-    public function parseLink($link)
-    {
-        $linkType  = null;
-        $linkClass = null;
-        $linkRaw   = null;
+        $kind     = null;
+        $type     = null;
+        $link     = null;
+        $query    = null;
+        $fragment = null;
+        $id       = null;
 
-        if (isset($link)) {
+        $url = parse_url($value);
 
-            if (Str::startsWith($link, 'entry::')) {
-                $id    = Str::after($link, 'entry::');
+        if (isset($url['query'])) {
+            $before = Str::before($value, '?');
+        } else if (isset($url['fragment'])) {
+            $before = Str::before($value, '#');
+        } else {
+            $before = $value;
+        }
+
+        $query    = $url['query'] ?? null;
+        $fragment = $url['fragment'] ?? null;
+
+        if (Str::startsWith($value, 'entry::')) {
+
+            $kind = 'entry';
+            $link = $before;
+            $id   = Str::after($link, 'entry::');
+            if ($includeType) {
                 $entry = Entry::find($id);
                 if ($entry && $entry->url()) {
-                    $linkType  = 'entry';
-                    $linkClass = 'entry::' . $entry->collection()->handle() . '/' . $entry->blueprint()->handle();
-                    $linkRaw   = $id;
+                    $type = 'entry::' . $entry->collection()->handle() . '/' . $entry->blueprint()->handle();
                 }
-            } else if ($link !== '@child') {
-                $linkType  = 'url';
-                $linkClass = $link;
-                $linkRaw   = $link;
-                if (Str::startsWith($linkClass, 'https://')) {
-                    $linkClass = 'http://' . Str::after($linkClass, 'https://');
+            }
+
+        } else if ($value !== '@child') {
+
+            $kind = 'url';
+            $link = $value;
+            if ($includeType) {
+                $type = $before;
+                if (Str::startsWith($type, 'https://')) {
+                    $type = 'http://' . Str::after($type, 'https://');
                 }
             }
             
         }
         
         return [
-            $linkType,
-            $linkClass,
-            $linkRaw,
+            'value'    => $value,
+            'kind'     => $kind,
+            'type'     => $type,
+            'link'     => $link,
+            'query'    => $query,
+            'fragment' => $fragment,
+            'id'       => $id,
         ];
     }
     

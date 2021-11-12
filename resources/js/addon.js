@@ -1,12 +1,12 @@
-import LinkFragment from './components/Fieldtypes/LinkFragment.vue';
+import FocalLinkFieldtype from './components/Fieldtypes/FocalLinkFieldtype.vue';
 
-window.StatamicLinkFragmentFieldtype = {
+window.StatamicFocalLink = {
     specCache: {},
     discoverCache: {},
 };
 
 Statamic.booting(() => {
 
-    Statamic.$components.register('link_fragment-fieldtype', LinkFragment);
+    Statamic.$components.register('focal_link-fieldtype', FocalLinkFieldtype);
 
 });
