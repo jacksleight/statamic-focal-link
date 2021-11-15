@@ -11,15 +11,16 @@ return [
     'links' => [
 
         'entry::*' => [
-            'queries' => [],
+            'queries' => [
+                //...
+            ],
             'fragments' => [
                 ':~:text={{ text }}' => 'Text Fragment',
             ],
-        ],
-
-        'entry::pages/*' => [
             'discovery' => [
                 '//*[@id]' => 'text()',
+                // '//*[@id]' => '@title',
+                // '//*[@id]' => '@data-label',
             ],
         ],
 

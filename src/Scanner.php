@@ -13,6 +13,10 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class Scanner
 {
+    protected $ignoreTags = [
+        'script',
+    ];
+
     public function scan($link, $spec)
     {
         if (! isset($link) || ! is_array($spec['discovery'])) {
@@ -21,9 +25,9 @@ class Scanner
 
         $html = null;
 
-        if ($link['kind'] === 'entry') {
+        if ($link['option'] === 'entry') {
             $html = $this->fetchEntryHtml($link['id']);
-        } elseif ($link['kind'] === 'url') {
+        } elseif ($link['option'] === 'url') {
             $html = $this->fetchUrlHtml($link['value']);
         }
 
@@ -82,16 +86,24 @@ class Scanner
                     ? $node->getAttributeNode('id')
                     : $node;
                 $value = trim($targetNode->textContent, "\n\r\t\v\0#");
+                if (empty($value)) {
+                    continue;
+                }
                 $label = Str::headline($value);
 
+                $refNode = $node instanceof DOMAttr
+                    ? $node->parentNode
+                    : $node;
+
+                if ($refNode instanceof DOMElement && in_array($refNode->tagName, $this->ignoreTags)) {
+                    continue;
+                }
+
                 if (is_string($labelQuery)) {
-                    $refNode = $node instanceof DOMAttr
-                        ? $node->parentNode
-                        : $node;
                     $labelNodes = $xpath->query($labelQuery, $refNode);
                     if ($labelNodes->length) {
                         $labelNode = $labelNodes->item(0);
-                        $labelText = trim(preg_replace('/\s+/', ' ', $labelNode->textContent));
+                        $labelText = Str::words(trim(preg_replace('/\s+/', ' ', $labelNode->textContent)), 12);
                         if (! empty($labelText)) {
                             $label = $labelText;
                         }

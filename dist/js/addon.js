@@ -142,6 +142,26 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
@@ -153,16 +173,9 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       fragmentValue: this.meta.initialFragment,
       queryTemplate: null,
       fragmentTemplate: null,
-      loading: false
+      loading: false // open: this.meta.initialOpen,
+
     };
-  },
-  watch: {
-    queryValue: function queryValue() {
-      this.update(this.returnValue);
-    },
-    fragmentValue: function fragmentValue() {
-      this.update(this.returnValue);
-    }
   },
   computed: {
     returnValue: function returnValue() {
@@ -174,10 +187,14 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
 
       if (this.queryValue) {
         value.search = "?".concat(this.queryValue);
+      } else {
+        value.search = '';
       }
 
       if (this.fragmentValue) {
         value.hash = "#".concat(this.fragmentValue);
+      } else {
+        value.hash = '';
       }
 
       return value.toString();
@@ -221,8 +238,17 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
     bothEnabled: function bothEnabled() {
       return this.queryEnabled && this.fragmentEnabled;
     },
+    eitherEnabled: function eitherEnabled() {
+      return this.queryEnabled || this.fragmentEnabled;
+    },
     discoveryPending: function discoveryPending() {
       return !this.spec || this.spec.discovery && !this.spec.discovered;
+    },
+    toggleVisible: function toggleVisible() {
+      return false; // return this.linkValue;
+    },
+    fieldsVisible: function fieldsVisible() {
+      return this.linkValue; // return this.linkValue && this.open;
     }
   },
   methods: {
@@ -380,7 +406,6 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
           label = "".concat(label, "\u2026");
         }
 
-        label = label.length > 80 ? "".concat(label.substr(0, 80), "\u2026") : label;
         return {
           value: value,
           label: value,
@@ -388,7 +413,10 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
           loading: false
         };
       });
-    }
+    } // toggle() {
+    //     this.open = !this.open;
+    // },
+
   }
 });
 
@@ -410,7 +438,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text {\n    padding-left: 20px !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text {\n    padding-left: 20px !important;\n}\n.sfl-height {\n    height: 38px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -897,307 +925,342 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "flex flex-col" },
-    [
-      _c("link-fieldtype", {
-        ref: "link",
-        attrs: {
-          handle: "link",
-          value: _vm.linkValue,
-          config: _vm.meta.link.config,
-          meta: _vm.meta.link.meta,
-        },
-        on: {
-          input: _vm.linkChanged,
-          "meta-updated": function ($event) {
-            _vm.meta.link.meta = $event
+  return _c("div", { staticClass: "flex flex-col" }, [
+    _c(
+      "div",
+      { staticClass: "space-x-1 flex items-center" },
+      [
+        _c("link-fieldtype", {
+          ref: "link",
+          staticClass: "flex-1",
+          attrs: {
+            handle: "link",
+            value: "linkValue",
+            config: _vm.meta.link.config,
+            meta: _vm.meta.link.meta,
           },
-        },
-      }),
-      _vm._v(" "),
-      _c("div", { staticClass: "mt-1 space-x-1 flex items-center" }, [
-        _c("div", { staticClass: "w-40 mr-1 flex-shrink-0 text-right" }),
-        _vm._v(" "),
-        _vm.queryEnabled
-          ? _c(
-              "div",
-              { staticClass: "sfl-input flex-1 flex items-center" },
-              [
-                _c("div", { staticClass: "sfl-prefix text-grey-60" }, [
-                  _vm._v("?"),
-                ]),
-                _vm._v(" "),
-                !_vm.queryTemplate
-                  ? _c("v-select", {
-                      ref: "query",
-                      staticClass: "flex-1",
-                      attrs: {
-                        placeholder: "query",
-                        value: _vm.queryValue,
-                        reduce: function (option) {
-                          return option.value
-                        },
-                        "create-option": function (value) {
-                          return { value: value, label: value, title: null }
-                        },
-                        clearable: true,
-                        options: _vm.queryOptions,
-                        searchable: true,
-                        taggable: true,
-                        "close-on-select": true,
-                      },
-                      on: { input: _vm.queryChanged, open: _vm.selectOpen },
-                      scopedSlots: _vm._u(
-                        [
-                          {
-                            key: "option",
-                            fn: function (option) {
-                              return [
-                                !option.loading
-                                  ? _c(
-                                      "div",
-                                      {
-                                        class: !_vm.bothEnabled
-                                          ? "flex flex-wrap justify-between"
-                                          : "flex flex-col",
-                                      },
-                                      [
-                                        _c("span", [
-                                          _vm._v(_vm._s(option.label)),
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("strong", [
-                                          _vm._v(_vm._s(option.title)),
-                                        ]),
-                                      ]
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                option.loading
-                                  ? _c(
-                                      "div",
-                                      [
-                                        _vm.loading
-                                          ? _c("loading-graphic", {
-                                              attrs: {
-                                                inline: true,
-                                                text: "Searching…",
-                                              },
-                                            })
-                                          : _vm._e(),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                              ]
-                            },
+          on: {
+            input: _vm.linkChanged,
+            "meta-updated": function ($event) {
+              _vm.meta.link.meta = $event
+            },
+          },
+        }),
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _vm.fieldsVisible
+      ? _c("div", { staticClass: "mt-1 space-x-1 flex items-center" }, [
+          _c("div", { staticClass: "w-40 mr-1 flex-shrink-0 text-right" }),
+          _vm._v(" "),
+          _vm.queryEnabled
+            ? _c(
+                "div",
+                { staticClass: "sfl-input flex-1 flex items-center" },
+                [
+                  _c("div", { staticClass: "sfl-prefix text-grey-60" }, [
+                    _vm._v("?"),
+                  ]),
+                  _vm._v(" "),
+                  !_vm.queryTemplate
+                    ? _c("v-select", {
+                        ref: "query",
+                        staticClass: "flex-1",
+                        attrs: {
+                          placeholder: "query",
+                          value: _vm.queryValue,
+                          reduce: function (option) {
+                            return option.value
                           },
-                          {
-                            key: "no-options",
-                            fn: function () {
-                              return [
-                                _c("div", {
-                                  staticClass:
-                                    "text-sm text-grey-70 text-left py-1 px-2",
-                                  domProps: {
-                                    textContent: _vm._s(
-                                      _vm.__("No options to choose from.")
-                                    ),
-                                  },
-                                }),
-                              ]
-                            },
-                            proxy: true,
+                          "create-option": function (value) {
+                            return { value: value, label: value, title: null }
                           },
-                        ],
-                        null,
-                        false,
-                        52952055
-                      ),
-                    })
-                  : _vm._e(),
-                _vm._v(" "),
-                _vm.queryTemplate
-                  ? _c("text-input", {
-                      ref: "query_template",
-                      staticClass: "flex-1",
-                      attrs: { append: "⏎" },
-                      on: {
-                        keydown: function ($event) {
-                          if (
-                            !$event.type.indexOf("key") &&
-                            _vm._k(
-                              $event.keyCode,
-                              "enter",
-                              13,
-                              $event.key,
-                              "Enter"
+                          clearable: true,
+                          options: _vm.queryOptions,
+                          searchable: true,
+                          taggable: true,
+                          "close-on-select": true,
+                        },
+                        on: { input: _vm.queryChanged, open: _vm.selectOpen },
+                        scopedSlots: _vm._u(
+                          [
+                            {
+                              key: "option",
+                              fn: function (option) {
+                                return [
+                                  !option.loading
+                                    ? _c(
+                                        "div",
+                                        {
+                                          class: !_vm.bothEnabled
+                                            ? "flex flex-wrap justify-between"
+                                            : "flex flex-col",
+                                        },
+                                        [
+                                          _c("span", [
+                                            _vm._v(_vm._s(option.label)),
+                                          ]),
+                                          _vm._v(" "),
+                                          _c("strong", [
+                                            _vm._v(_vm._s(option.title)),
+                                          ]),
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  option.loading
+                                    ? _c(
+                                        "div",
+                                        [
+                                          _vm.loading
+                                            ? _c("loading-graphic", {
+                                                attrs: {
+                                                  inline: true,
+                                                  text: "Searching…",
+                                                },
+                                              })
+                                            : _vm._e(),
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e(),
+                                ]
+                              },
+                            },
+                            {
+                              key: "no-options",
+                              fn: function () {
+                                return [
+                                  _c("div", {
+                                    staticClass:
+                                      "text-sm text-grey-70 text-left py-1 px-2",
+                                    domProps: {
+                                      textContent: _vm._s(
+                                        _vm.__("No options to choose from.")
+                                      ),
+                                    },
+                                  }),
+                                ]
+                              },
+                              proxy: true,
+                            },
+                          ],
+                          null,
+                          false,
+                          52952055
+                        ),
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.queryTemplate
+                    ? _c("text-input", {
+                        ref: "query_template",
+                        staticClass: "flex-1",
+                        attrs: { append: "⏎" },
+                        on: {
+                          keydown: function ($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.queryTemplateCommit.apply(
+                              null,
+                              arguments
                             )
-                          ) {
-                            return null
-                          }
-                          return _vm.queryTemplateCommit.apply(null, arguments)
-                        },
-                        blur: _vm.queryTemplateCommit,
-                      },
-                      model: {
-                        value: _vm.queryTemplate,
-                        callback: function ($$v) {
-                          _vm.queryTemplate = $$v
-                        },
-                        expression: "queryTemplate",
-                      },
-                    })
-                  : _vm._e(),
-              ],
-              1
-            )
-          : _vm._e(),
-        _vm._v(" "),
-        _vm.fragmentEnabled
-          ? _c(
-              "div",
-              { staticClass: "sfl-input flex-1 flex items-center" },
-              [
-                _c("div", { staticClass: "sfl-prefix text-grey-60" }, [
-                  _vm._v("#"),
-                ]),
-                _vm._v(" "),
-                !_vm.fragmentTemplate
-                  ? _c("v-select", {
-                      ref: "fragment",
-                      staticClass: "flex-1",
-                      attrs: {
-                        placeholder: "fragment",
-                        value: _vm.fragmentValue,
-                        reduce: function (option) {
-                          return option.value
-                        },
-                        "create-option": function (value) {
-                          return { value: value, label: value, title: null }
-                        },
-                        clearable: true,
-                        options: _vm.fragmentOptions,
-                        searchable: true,
-                        taggable: true,
-                        "close-on-select": true,
-                      },
-                      on: { input: _vm.fragmentChanged, open: _vm.selectOpen },
-                      scopedSlots: _vm._u(
-                        [
-                          {
-                            key: "option",
-                            fn: function (option) {
-                              return [
-                                !option.loading
-                                  ? _c(
-                                      "div",
-                                      {
-                                        class: !_vm.bothEnabled
-                                          ? "flex flex-wrap justify-between"
-                                          : "flex flex-col",
-                                      },
-                                      [
-                                        _c("span", [
-                                          _vm._v(_vm._s(option.label)),
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("strong", [
-                                          _vm._v(_vm._s(option.title)),
-                                        ]),
-                                      ]
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                option.loading
-                                  ? _c(
-                                      "div",
-                                      [
-                                        _vm.loading
-                                          ? _c("loading-graphic", {
-                                              attrs: {
-                                                inline: true,
-                                                text: "Searching…",
-                                              },
-                                            })
-                                          : _vm._e(),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                              ]
-                            },
                           },
-                          {
-                            key: "no-options",
-                            fn: function () {
-                              return [
-                                _c("div", {
-                                  staticClass:
-                                    "text-sm text-grey-70 text-left py-1 px-2",
-                                  domProps: {
-                                    textContent: _vm._s(
-                                      _vm.__("No options to choose from.")
-                                    ),
-                                  },
-                                }),
-                              ]
-                            },
-                            proxy: true,
+                          blur: _vm.queryTemplateCommit,
+                        },
+                        model: {
+                          value: _vm.queryTemplate,
+                          callback: function ($$v) {
+                            _vm.queryTemplate = $$v
                           },
-                        ],
-                        null,
-                        false,
-                        52952055
-                      ),
-                    })
-                  : _vm._e(),
-                _vm._v(" "),
-                _vm.fragmentTemplate
-                  ? _c("text-input", {
-                      ref: "fragment_template",
-                      staticClass: "flex-1",
-                      attrs: { append: "⏎" },
-                      on: {
-                        keydown: function ($event) {
-                          if (
-                            !$event.type.indexOf("key") &&
-                            _vm._k(
-                              $event.keyCode,
-                              "enter",
-                              13,
-                              $event.key,
-                              "Enter"
+                          expression: "queryTemplate",
+                        },
+                      })
+                    : _vm._e(),
+                ],
+                1
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.fragmentEnabled
+            ? _c(
+                "div",
+                { staticClass: "sfl-input flex-1 flex items-center" },
+                [
+                  _c("div", { staticClass: "sfl-prefix text-grey-60" }, [
+                    _vm._v("#"),
+                  ]),
+                  _vm._v(" "),
+                  !_vm.fragmentTemplate
+                    ? _c("v-select", {
+                        ref: "fragment",
+                        staticClass: "flex-1",
+                        attrs: {
+                          placeholder: "fragment",
+                          value: _vm.fragmentValue,
+                          reduce: function (option) {
+                            return option.value
+                          },
+                          "create-option": function (value) {
+                            return { value: value, label: value, title: null }
+                          },
+                          clearable: true,
+                          options: _vm.fragmentOptions,
+                          searchable: true,
+                          taggable: true,
+                          "close-on-select": true,
+                        },
+                        on: {
+                          input: _vm.fragmentChanged,
+                          open: _vm.selectOpen,
+                        },
+                        scopedSlots: _vm._u(
+                          [
+                            {
+                              key: "option",
+                              fn: function (option) {
+                                return [
+                                  !option.loading
+                                    ? _c(
+                                        "div",
+                                        {
+                                          class: !_vm.bothEnabled
+                                            ? "flex flex-wrap justify-between"
+                                            : "flex flex-col",
+                                        },
+                                        [
+                                          _c("span", [
+                                            _vm._v(_vm._s(option.label)),
+                                          ]),
+                                          _vm._v(" "),
+                                          _c("strong", [
+                                            _vm._v(_vm._s(option.title)),
+                                          ]),
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  option.loading
+                                    ? _c(
+                                        "div",
+                                        [
+                                          _vm.loading
+                                            ? _c("loading-graphic", {
+                                                attrs: {
+                                                  inline: true,
+                                                  text: "Searching…",
+                                                },
+                                              })
+                                            : _vm._e(),
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e(),
+                                ]
+                              },
+                            },
+                            {
+                              key: "no-options",
+                              fn: function () {
+                                return [
+                                  _c("div", {
+                                    staticClass:
+                                      "text-sm text-grey-70 text-left py-1 px-2",
+                                    domProps: {
+                                      textContent: _vm._s(
+                                        _vm.__("No options to choose from.")
+                                      ),
+                                    },
+                                  }),
+                                ]
+                              },
+                              proxy: true,
+                            },
+                          ],
+                          null,
+                          false,
+                          52952055
+                        ),
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.fragmentTemplate
+                    ? _c("text-input", {
+                        ref: "fragment_template",
+                        staticClass: "flex-1",
+                        attrs: { append: "⏎" },
+                        on: {
+                          keydown: function ($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.fragmentTemplateCommit.apply(
+                              null,
+                              arguments
                             )
-                          ) {
-                            return null
-                          }
-                          return _vm.fragmentTemplateCommit.apply(
-                            null,
-                            arguments
-                          )
+                          },
+                          blur: _vm.fragmentTemplateCommit,
                         },
-                        blur: _vm.fragmentTemplateCommit,
-                      },
-                      model: {
-                        value: _vm.fragmentTemplate,
-                        callback: function ($$v) {
-                          _vm.fragmentTemplate = $$v
+                        model: {
+                          value: _vm.fragmentTemplate,
+                          callback: function ($$v) {
+                            _vm.fragmentTemplate = $$v
+                          },
+                          expression: "fragmentTemplate",
                         },
-                        expression: "fragmentTemplate",
-                      },
-                    })
-                  : _vm._e(),
-              ],
-              1
-            )
-          : _vm._e(),
-      ]),
-    ],
-    1
-  )
+                      })
+                    : _vm._e(),
+                ],
+                1
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          !_vm.eitherEnabled
+            ? _c(
+                "div",
+                {
+                  staticClass:
+                    "flex-1 p-1 rounded border border-grey-40 flex justify-center items-center sfl-height",
+                },
+                [
+                  !_vm.loading
+                    ? _c("span", { staticClass: "text-sm text-grey-60" }, [
+                        _vm._v("No additional options."),
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.loading
+                    ? _c("loading-graphic", {
+                        attrs: { inline: true, text: "Loading…" },
+                      })
+                    : _vm._e(),
+                ],
+                1
+              )
+            : _vm._e(),
+        ])
+      : _vm._e(),
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true

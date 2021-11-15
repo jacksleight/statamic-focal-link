@@ -7,14 +7,11 @@ use Str;
 
 class Utilities
 {
-    protected $presets;
+    protected $specs;
 
-    protected $links;
-
-    public function __construct($presets, $links)
+    public function __construct($links, $presets)
     {
-        $this->presets = collect($presets);
-        $this->links = collect($links);
+        $this->specs = collect($links)->union($presets)->reverse();
     }
 
     public function getSpec($link)
@@ -30,29 +27,14 @@ class Utilities
             'discovered' => false,
         ];
 
-        $filter = function ($config, $pattern) use ($link) {
-            if (Str::startsWith($pattern, 'https://')) {
-                $pattern = 'http://'.Str::after($pattern, 'https://');
-            }
-
-            return Str::is($pattern, $link['type']);
-        };
-
-        collect()
-            ->merge($this->presets->filter($filter)->values())
-            ->merge($this->links->filter($filter)->values())
-            ->each(function ($config) use (&$spec) {
-                if (! is_array($config)) {
-                    return;
-                }
-                foreach ($config as $key => $list) {
-                    if (is_array($spec[$key]) && is_array($list)) {
-                        $spec[$key] = array_merge($spec[$key], $list);
-                    } else {
-                        $spec[$key] = $list;
-                    }
-                }
+        $match = $this->specs
+            ->search(function ($config, $pattern) use ($link) {
+                return Str::is($this->normalizeUrl($pattern), $link['type']);
             });
+
+        if ($match) {
+            $spec = $this->specs->get($match) + $spec;
+        }
 
         return $spec;
     }
@@ -63,7 +45,7 @@ class Utilities
             return;
         }
 
-        $kind = null;
+        $option = null;
         $type = null;
         $link = null;
         $query = null;
@@ -84,7 +66,7 @@ class Utilities
         $fragment = $url['fragment'] ?? null;
 
         if (Str::startsWith($value, 'entry::')) {
-            $kind = 'entry';
+            $option = 'entry';
             $link = $before;
             $id = Str::after($link, 'entry::');
             if ($includeType) {
@@ -94,24 +76,33 @@ class Utilities
                 }
             }
         } elseif ($value !== '@child') {
-            $kind = 'url';
+            $option = 'url';
             $link = $value;
             if ($includeType) {
-                $type = $before;
-                if (Str::startsWith($type, 'https://')) {
-                    $type = 'http://'.Str::after($type, 'https://');
-                }
+                $type = $this->normalizeUrl($before);
             }
         }
 
         return [
             'value'    => $value,
-            'kind'     => $kind,
+            'option'     => $option,
             'type'     => $type,
             'link'     => $link,
             'query'    => $query,
             'fragment' => $fragment,
             'id'       => $id,
         ];
+    }
+
+    public function normalizeUrl($url)
+    {
+        if (Str::startsWith($url, 'https://')) {
+            $url = 'http://'.Str::after($url, 'https://');
+        }
+        if (Str::startsWith($url, 'http://www.')) {
+            $url = 'http://'.Str::after($url, 'http://www.');
+        }
+
+        return $url;
     }
 }

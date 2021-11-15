@@ -33,7 +33,7 @@ And then opening `config/statamic/focal_link.php` and editing the `links` list.
 Each key in the list should be a pattern that matches a type of link:
 
 * Entry links use the pattern `entry::[collection]/[blueprint]`
-* URL links use the full URL up to the end of the path (`https` will be mapped to `http` automatically)
+* URL links use the full URL up to the end of the path (`http(s)` and `www` will be normalized automatically)
 
 You can use asterisks in the pattern to perform wildcard matches.
 

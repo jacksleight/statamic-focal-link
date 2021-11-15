@@ -1,18 +1,29 @@
 <template>
     <div class="flex flex-col">
 
-        <!-- Link field -->
-        <link-fieldtype
-            ref="link"
-            handle="link"
-            :value="linkValue"
-            :config="meta.link.config"
-            :meta="meta.link.meta"
-            @input="linkChanged"
-            @meta-updated="meta.link.meta = $event"
-        />
+        <div class="space-x-1 flex items-center">
 
-        <div class="mt-1 space-x-1 flex items-center">
+            <!-- Link field -->
+            <link-fieldtype
+                ref="link"
+                handle="link"
+                value="linkValue"
+                class="flex-1"
+                :config="meta.link.config"
+                :meta="meta.link.meta"
+                @input="linkChanged"
+                @meta-updated="meta.link.meta = $event"
+            />
+            <!-- <div
+                v-if="toggleVisible"
+                class="w-8 ml-1 border border-grey-50 p-1 rounded sfl-height text-center"
+                @click="toggle">
+                #
+            </div> -->
+
+        </div>
+
+        <div class="mt-1 space-x-1 flex items-center" v-if="fieldsVisible">
         
             <div class="w-40 mr-1 flex-shrink-0 text-right"></div>
 
@@ -111,6 +122,15 @@
 
             </div>
 
+            <div
+                v-if="!eitherEnabled"
+                class="flex-1 p-1 rounded border border-grey-40 flex justify-center items-center sfl-height">
+
+                <span class="text-sm text-grey-60" v-if="!loading">No additional options.</span>
+                <loading-graphic v-if="loading" :inline="true" text="Loading…" />
+
+            </div>
+
         </div>
 
     </div>
@@ -134,19 +154,8 @@ export default {
             queryTemplate: null,
             fragmentTemplate: null,
             loading: false,
+            // open: this.meta.initialOpen,
         }
-
-    },
-
-    watch: {
-
-        queryValue() {
-            this.update(this.returnValue);
-        },
-        
-        fragmentValue() {
-            this.update(this.returnValue);
-        },
 
     },
 
@@ -159,9 +168,13 @@ export default {
             const value = new URL(this.linkValue);
             if (this.queryValue) {
                 value.search = `?${this.queryValue}`;
+            } else {
+                value.search = '';
             }
             if (this.fragmentValue) {
                 value.hash = `#${this.fragmentValue}`;
+            } else {
+                value.hash = '';
             }
             return value.toString();
         },
@@ -206,8 +219,22 @@ export default {
             return this.queryEnabled && this.fragmentEnabled;
         },
 
+        eitherEnabled() {
+            return this.queryEnabled || this.fragmentEnabled;
+        },
+
         discoveryPending() {
             return !this.spec || (this.spec.discovery && !this.spec.discovered);
+        },
+
+        toggleVisible() {
+            return false;
+            // return this.linkValue;
+        },
+
+        fieldsVisible() {
+            return this.linkValue;
+            // return this.linkValue && this.open;
         },
 
     },
@@ -343,9 +370,6 @@ export default {
                     if (this.isTemplate(value)) {
                         label = `${label}…`;
                     }
-                    label = label.length > 80
-                        ? `${label.substr(0, 80)}…`
-                        : label;
                     return {
                         value: value,
                         label: value,
@@ -354,6 +378,10 @@ export default {
                      };
                 });
         },
+
+        // toggle() {
+        //     this.open = !this.open;
+        // },
 
     }
 
@@ -374,5 +402,8 @@ export default {
 .sfl-input .vs__selected-options,
 .sfl-input .input-text {
     padding-left: 20px !important;
+}
+.sfl-height {
+    height: 38px;
 }
 </style>

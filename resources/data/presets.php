@@ -14,20 +14,20 @@ return [
         ],
     ],
 
-    'https://laravel.com/docs/*' => [
+    'http://laravel.com/*' => [
         'discovery' => [
-            "//*[@id='main-content']//*[not(self::script)][@id]" => 'text()',
+            "//*[@id='main-content']//*[@id]" => 'text()',
         ],
     ],
 
-    'http://www.youtube.com/*' => [
+    'http://youtube.com/*' => [
         'fragments' => [
             't={{ 1m30s }}' => 'Timecode',
             't={{ 90 }}'    => 'Time in Seconds',
         ],
     ],
 
-    'https://vimeo.com/*' => [
+    'http://vimeo.com/*' => [
         'fragments' => [
             't={{ 1m30s }}' => 'Timecode',
         ],

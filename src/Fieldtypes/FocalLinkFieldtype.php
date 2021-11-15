@@ -30,7 +30,7 @@ class FocalLinkFieldtype extends Fieldtype
 
     public function augment($value)
     {
-        if (! isset($link)) {
+        if (! isset($value)) {
             return;
         }
 
@@ -42,7 +42,7 @@ class FocalLinkFieldtype extends Fieldtype
             return null;
         }
 
-        if ($link['kind'] === 'entry') {
+        if ($link['option'] === 'entry') {
             if (isset($link['query'])) {
                 $redirect .= "?{$link['query']}";
             }
@@ -61,12 +61,13 @@ class FocalLinkFieldtype extends Fieldtype
         $link = Utilities::parseLink($value, true);
         $spec = Utilities::getSpec($link);
 
-        $linkFieldtype = $this->nestedLinkFieldtype($link['link']);
+        $linkFieldtype = $this->nestedLinkFieldtype($link['link'] ?? null);
 
         return [
-            'initialLink' => $link['link'],
-            'initialQuery' => $link['query'],
-            'initialFragment' => $link['fragment'],
+            'initialLink' => $link['link'] ?? null,
+            'initialQuery' => $link['query'] ?? null,
+            'initialFragment' => $link['fragment'] ?? null,
+            // 'initialOpen' => ($link['query'] ?? null) || ($link['fragment'] ?? null),
             'spec' => $spec,
             'link' => [
                 'config' => $linkFieldtype->config(),
