@@ -124,9 +124,9 @@
 
             <div
                 v-if="!eitherEnabled"
-                class="flex-1 p-1 rounded border border-grey-40 flex justify-center items-center sfl-height">
+                class="flex-1 p-1 rounded border border-grey-40 bg-grey-10 flex justify-center items-center sfl-height">
 
-                <span class="text-sm text-grey-60" v-if="!loading">No additional options.</span>
+                <span class="text-sm text-grey" v-if="!loading">No additional options.</span>
                 <loading-graphic v-if="loading" :inline="true" text="Loading…" />
 
             </div>

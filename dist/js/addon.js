@@ -1240,11 +1240,11 @@ var render = function () {
                 "div",
                 {
                   staticClass:
-                    "flex-1 p-1 rounded border border-grey-40 flex justify-center items-center sfl-height",
+                    "flex-1 p-1 rounded border border-grey-40 bg-grey-10 flex justify-center items-center sfl-height",
                 },
                 [
                   !_vm.loading
-                    ? _c("span", { staticClass: "text-sm text-grey-60" }, [
+                    ? _c("span", { staticClass: "text-sm text-grey" }, [
                         _vm._v("No additional options."),
                       ])
                     : _vm._e(),
