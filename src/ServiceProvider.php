@@ -3,8 +3,6 @@
 namespace JackSleight\StatamicFocalLink;
 
 use Statamic\Providers\AddonServiceProvider;
-use JackSleight\StatamicFocalLink\Scanner;
-use JackSleight\StatamicFocalLink\Utilities;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -13,7 +11,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $scripts = [
-        __DIR__ . '/../dist/js/addon.js',
+        __DIR__.'/../dist/js/addon.js',
     ];
 
     protected $fieldtypes = [
@@ -25,11 +23,12 @@ class ServiceProvider extends AddonServiceProvider
         parent::register();
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/statamic/focal_link.php', 'statamic.focal_link',
+            __DIR__.'/../config/statamic/focal_link.php', 'statamic.focal_link',
         );
 
         $this->app->singleton(Utilities::class, function () {
             $presets = require_once __DIR__.'/../resources/data/presets.php';
+
             return new Utilities($presets, config('statamic.focal_link.links'));
         });
         $this->app->singleton(Scanner::class, function () {
@@ -42,7 +41,7 @@ class ServiceProvider extends AddonServiceProvider
         parent::boot();
 
         $this->publishes([
-            __DIR__ . '/../config/statamic/focal_link.php' => config_path('statamic/focal_link.php'),
+            __DIR__.'/../config/statamic/focal_link.php' => config_path('statamic/focal_link.php'),
         ], 'statamic-focal-link-config');
     }
 }

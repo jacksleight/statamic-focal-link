@@ -2,10 +2,10 @@
 
 namespace JackSleight\StatamicFocalLink\Fieldtypes;
 
-use Statamic\Fields\Fieldtype;
-use Statamic\Fields\Field;
 use Facades\Statamic\Routing\ResolveRedirect;
 use JackSleight\StatamicFocalLink\Facades\Utilities;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
 
 class FocalLinkFieldtype extends Fieldtype
 {
@@ -30,12 +30,12 @@ class FocalLinkFieldtype extends Fieldtype
 
     public function augment($value)
     {
-        if (!isset($link)) {
+        if (! isset($link)) {
             return;
         }
-        
+
         $link = Utilities::parseLink($value);
-        
+
         $redirect = ResolveRedirect::resolve($link['link'], $this->field->parent());
 
         if ($redirect === 404) {

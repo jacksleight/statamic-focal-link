@@ -6,7 +6,6 @@ use DOMAttr;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
-use Exception;
 use Illuminate\Http\Request;
 use Statamic\Facades\Entry;
 use Str;
@@ -16,15 +15,15 @@ class Scanner
 {
     public function scan($link, $spec)
     {
-        if (!isset($link) || !is_array($spec['discovery'])) {
+        if (! isset($link) || ! is_array($spec['discovery'])) {
             return $spec;
         }
-            
+
         $html = null;
 
         if ($link['kind'] === 'entry') {
             $html = $this->fetchEntryHtml($link['id']);
-        } else if ($link['kind'] === 'url') {
+        } elseif ($link['kind'] === 'url') {
             $html = $this->fetchUrlHtml($link['value']);
         }
 
@@ -41,7 +40,7 @@ class Scanner
     protected function fetchEntryHtml($id)
     {
         $entry = Entry::find($id);
-        if (!$entry || !$entry->url()) {
+        if (! $entry || ! $entry->url()) {
             throw new Excpetion;
         }
 
@@ -76,11 +75,9 @@ class Scanner
         $xpath = new DOMXPath($dom);
 
         foreach ($spec['discovery'] as $targetQuery => $labelQuery) {
-
             $nodes = $xpath->query($targetQuery);
 
             foreach ($nodes as $node) {
-
                 $targetNode = $node instanceof DOMElement
                     ? $node->getAttributeNode('id')
                     : $node;
@@ -95,16 +92,14 @@ class Scanner
                     if ($labelNodes->length) {
                         $labelNode = $labelNodes->item(0);
                         $labelText = trim(preg_replace('/\s+/', ' ', $labelNode->textContent));
-                        if (!empty($labelText)) {
+                        if (! empty($labelText)) {
                             $label = $labelText;
                         }
                     }
                 }
 
                 $fragments->put($value, $label);
-
             }
-
         }
 
         return $fragments->all();

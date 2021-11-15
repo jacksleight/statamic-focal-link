@@ -13,13 +13,13 @@ return [
         'entry::*' => [
             'queries' => [],
             'fragments' => [
-                ":~:text={{ text }}" => "Text Fragment",
+                ':~:text={{ text }}' => 'Text Fragment',
             ],
         ],
 
         'entry::pages/*' => [
             'discovery' => [
-                "//*[@id]" => "text()",
+                '//*[@id]' => 'text()',
             ],
         ],
 
