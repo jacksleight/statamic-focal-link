@@ -98,7 +98,7 @@ Mutator::tag('heading', function ($tag, $data) {
 
 ## Popular Site Presets
 
-The addon comes with a handful of presets for popular sites. If you know of others and would like them added feel free to submit an issue or PR.
+The addon comes with a [handful of presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for popular sites. If you know of others and would like them added feel free to submit an issue or PR.
 
 ## Link Fieldtype Compatibility
 
