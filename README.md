@@ -20,13 +20,13 @@ composer require jacksleight/statamic-focal-link
 
 ## Configuration
 
-As every site is different Focal Link does not make any assumptions about what to enable when. You'll need to tell it what to enable for each type of link by publishing the config:
+The default configuration comes with a couple of examples to get you started, but as every site is different you'll need to tell it what to enable and how for best results. To do this publish the config:
 
 ```bash
 php please vendor:publish --tag=statamic-focal-link-config
 ```
 
-And then opening `config/statamic/focal_link.php`. 
+And then open `config/statamic/focal_link.php`. 
 
 ## Getting Started
 
@@ -105,3 +105,11 @@ The addon comes with a handful of presets for popular sites. If you know of othe
 I’ve tried to make this fieldtype work as seamlessly as possible with the built-in Link fieldtype. Depending on the link this either stores values in an identical format or a suffixed format.
 
 Any Link field can be changed to a Focal Link field and the values will be compatible. If you change a Focal Link field back to a Link field Entry values with a query or fragment set will not be compatible, the suffixes will need to be removed.
+
+<!-- statamic:hide -->
+
+## Licencing
+
+Statamic Memberbox is not free software. You will need to purchase a license via the [Statamic Marketplace](https://statamic.com/addons/jacksleight/memberbox) to use it in production.
+
+<!-- /statamic:hide -->
