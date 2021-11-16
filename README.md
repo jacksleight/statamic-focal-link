@@ -20,28 +20,28 @@ composer require jacksleight/statamic-focal-link
 
 ## Configuration
 
-As every site is different Focal Link does not make any assumptions about what to enable, you'll need to tell it which fields and options should be made avaliable by publishing the config:
+As every site is different Focal Link does not make any assumptions about what to enable when. You'll need to tell it what to enable for each type of link by publishing the config:
 
 ```bash
 php please vendor:publish --tag=statamic-focal-link-config
 ```
 
-And then opening `config/statamic/focal_link.php` and editing the `types` list. 
+And then opening `config/statamic/focal_link.php`. 
 
-### The Basics
+## Getting Started
 
-Each key in the list should be a pattern that matches a type of link, these can contain asterisks to perform wildcard matches. They should be in order of specificity, most specific last.
+Each key in the `types` list should be a pattern that matches a type of link. These can contain asterisks to perform wildcard matches. They should be in order of specificity (lowest to highest), the most specific match will be used.
 
 * Entry link types use the pattern `entry::[collection]/[blueprint]`
-* URL link types use the full URL up to the end of the path
+* URL link types use the pattern `[protocol][host][path]` (`http(s)` and `www` will be normalized automatically)
 
 Each type can contain the following settings:
 
-* **queries:** A value/label list of query string options/templates for this link type
-* **fragments:** A value/label list of fragment identifier options/templates for this link type
-* **discovery:** A value/label list of XPath expressions used to find fragment identifiers in the destination page
+* **queries:** A value/label array of query string options or templates
+* **fragments:** A value/label array of fragment identifier options or templates
+* **discovery:** A value/label array of XPath expressions used to find fragment identifiers in the destination page
 
-If **queries** or **fragments** are excluded entirely those fields will not appear at all.
+If **queries** or **fragments** are excluded those fields will not appear at all.
 
 ### Query & Fragment Options
 
@@ -51,7 +51,7 @@ Options can either be a fixed value or a template value. Templates must contain 
 
 You can enable automatic ID discovery by setting the `discovery` option to an array of XPath expressions, these will be used to find matching elements in the destination page.
 
-The key should be the path to the elements containing the ID attribute, the value should be the path to the node that contains the label, relative to the element. If you set the value to `true` a label will be generated from the ID using `Str::headline()`.
+The key should be the path to the elements containing the ID attribute, the value should be the path to the node that contains the label relative to the element. If the value is not set or the node cannot be found a label will be generated from the ID using `Str::headline()`.
 
 ### Example Link Type Settings
 
@@ -94,9 +94,9 @@ Mutator::tag('heading', function ($tag, $data) {
 });
 ```
 
-## Common Format & Popular Site Presets
+## Popular Site Presets
 
-The addon comes with a handful of presets for common formats and popular sites. I would like to grow this list so if you know of others and would like them added feel free to submit an issue or PR.
+The addon comes with a handful of presets for popular sites. If you know of others and would like them added feel free to submit an issue or PR.
 
 ## Link Fieldtype Compatibility
 
