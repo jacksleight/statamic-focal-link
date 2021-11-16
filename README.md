@@ -8,7 +8,7 @@
 
 <!-- /statamic:hide -->
 
-This Statamic fieldtype streamlines linking to entry/URL fragment identifiers and query strings. It supports automatic ID discovery, predefined options, option templates and manual input. Automatic ID discovery works by scanning the destination page for fragment identifiers and then allowing you to select one from a list. You can control exactly which IDs are discovered using XPath expressions.
+This Statamic fieldtype streamlines linking to entry/URL fragment identifiers and query strings. It supports automatic ID discovery, predefined options, option templates and manual input. Automatic ID discovery works by scanning the destination page for fragment identifiers and allowing you to select one from a list. You can control exactly which IDs are discovered using XPath expressions.
 
 ## Installation
 
@@ -39,13 +39,13 @@ Each key in the `types` list should be a pattern that matches a type of link. Th
 
 Each type can contain the following settings:
 
-* **queries:** A value/label array of query string options or templates
-* **fragments:** A value/label array of fragment identifier options or templates
 * **discovery:** A value/label array of XPath expressions used to find fragment identifiers in the destination page
+* **fragments:** A value/label array of fragment identifier options or templates
+* **queries:** A value/label array of query string options or templates
 
-If **queries** or **fragments** are excluded those fields will not appear at all.
+If **fragments** or **queries** are excluded those fields will not appear at all.
 
-### Query & Fragment Options
+### Fragment & Query Options
 
 Options can either be a fixed value or a template value. Templates must contain the string `{{ [placeholder] }}`, this where the cursor will be placed when the template is selected.
 
@@ -60,9 +60,8 @@ The key should be the path to the elements containing the ID attribute, the valu
 ```php
 'entry::products/*' => [ // All entries within the products collection
 
-    'queries' => [
-        "size=large" => "Size — Large" // A fixed option
-        "size={{ medium }}" => "Size" // A template option
+    'discovery' => [
+        "//*[@id]" => "text()", // Elements with an ID attribute, with the text content as a label
     ],
 
     'fragments' => [
@@ -70,8 +69,9 @@ The key should be the path to the elements containing the ID attribute, the valu
         ":~:text={{ text }}" => "Text Fragment", // A template option
     ],
 
-    'discovery' => [
-        "//*[@id]" => "text()", // Elements with an ID attribute, with the text content as a label
+    'queries' => [
+        "size=large" => "Size — Large" // A fixed option
+        "size={{ medium }}" => "Size" // A template option
     ],
 
 ],

@@ -11,20 +11,20 @@ return [
     'types' => [
 
         '*' => [
-            'queries' => [],
             'fragments' => [],
+            'queries' => [],
         ],
 
         'entry::*' => [
-            'queries' => [],
-            'fragments' => [
-                ':~:text={{ text }}' => 'Text Fragment',
-            ],
             'discovery' => [
                 '//*[@id]' => 'text()',
                 // '//*[@id]' => '@title',
                 // '//*[@id]' => '@data-label',
             ],
+            'fragments' => [
+                ':~:text={{ text }}' => 'Text Fragment',
+            ],
+            'queries' => [],
         ],
 
     ],
