@@ -8,7 +8,7 @@
 
 <!-- /statamic:hide -->
 
-This Statamic fieldtype simplifies linking to entry/URL fragment identifiers and query strings. It supports automatic ID discovery, predefined options, option templates and manual input.
+This Statamic fieldtype streamlines linking to entry/URL fragment identifiers and query strings. It supports automatic ID discovery, predefined options, option templates and manual input.
 
 ## Installation
 
@@ -20,22 +20,28 @@ composer require jacksleight/statamic-focal-link
 
 ## Configuration
 
-You can configure which options are avaliable for each type of link by publishing the config:
+As every site is different Focal Link does not make any assumptions about what to enable, you'll need to tell it which fields and options should be made avaliable by publishing the config:
 
 ```bash
 php please vendor:publish --tag=statamic-focal-link-config
 ```
 
-And then opening `config/statamic/focal_link.php` and editing the `links` list.
+And then opening `config/statamic/focal_link.php` and editing the `types` list. 
 
-### Link Matching Patterns
+### The Basics
 
-Each key in the list should be a pattern that matches a type of link:
+Each key in the list should be a pattern that matches a type of link, these can contain asterisks to perform wildcard matches. They should be in order of specificity, most specific last.
 
-* Entry links use the pattern `entry::[collection]/[blueprint]`
-* URL links use the full URL up to the end of the path (`http(s)` and `www` will be normalized automatically)
+* Entry link types use the pattern `entry::[collection]/[blueprint]`
+* URL link types use the full URL up to the end of the path
 
-You can use asterisks in the pattern to perform wildcard matches.
+Each type can contain the following settings:
+
+* **queries:** A value/label list of query string options/templates for this link type
+* **fragments:** A value/label list of fragment identifier options/templates for this link type
+* **discovery:** A value/label list of XPath expressions used to find fragment identifiers in the destination page
+
+If **queries** or **fragments** are excluded entirely those fields will not appear at all.
 
 ### Query & Fragment Options
 
@@ -45,37 +51,25 @@ Options can either be a fixed value or a template value. Templates must contain 
 
 You can enable automatic ID discovery by setting the `discovery` option to an array of XPath expressions, these will be used to find matching elements in the destination page.
 
-The array keys should be the path to the elements containing the ID attribute, the values should be the path to the node that contains the label, relative to the element. If you set the value to `true` a label will be generated from the ID using `Str::headline()`.
+The key should be the path to the elements containing the ID attribute, the value should be the path to the node that contains the label, relative to the element. If you set the value to `true` a label will be generated from the ID using `Str::headline()`.
 
-### Example Configuration
+### Example Link Type Settings
 
 ```php
-/*
-The link pattern
-*/
-'entry::products/*' => [ // All blueprints within the products collection
+'entry::products/*' => [ // All entries within the products collection
 
-    /*
-    Query string options
-    */
     'queries' => [
-        "size=large"      => "Size — Large" // A fixed option
-        "size={{ size }}" => "Size" // A template option
+        "size=large" => "Size — Large" // A fixed option
+        "size={{ medium }}" => "Size" // A template option
     ],
 
-    /*
-    Fragment itentifier options
-    */
     'fragments' => [
-        "reviews"            => "Reviews" // A fixed option
+        "reviews" => "Reviews" // A fixed option
         ":~:text={{ text }}" => "Text Fragment", // A template option
     ],
 
-    /*
-    Fragment identifier discovery options
-    */
     'discovery' => [
-        "//*[@id]" => "text()", // Match all elements with an ID attribute and use the text content as a label
+        "//*[@id]" => "text()", // Elements with an ID attribute, with the text content as a label
     ],
 
 ],

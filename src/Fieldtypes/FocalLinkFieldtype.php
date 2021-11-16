@@ -67,7 +67,6 @@ class FocalLinkFieldtype extends Fieldtype
             'initialLink' => $link['link'] ?? null,
             'initialQuery' => $link['query'] ?? null,
             'initialFragment' => $link['fragment'] ?? null,
-            // 'initialOpen' => ($link['query'] ?? null) || ($link['fragment'] ?? null),
             'spec' => $spec,
             'link' => [
                 'config' => $linkFieldtype->config(),

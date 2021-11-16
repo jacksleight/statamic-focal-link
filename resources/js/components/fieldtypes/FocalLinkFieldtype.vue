@@ -14,12 +14,6 @@
                 @input="linkChanged"
                 @meta-updated="meta.link.meta = $event"
             />
-            <!-- <div
-                v-if="toggleVisible"
-                class="w-8 ml-1 border border-grey-50 p-1 rounded sfl-height text-center"
-                @click="toggle">
-                #
-            </div> -->
 
         </div>
 
@@ -34,7 +28,6 @@
                 <div class="sfl-prefix text-grey-60">?</div>
 
                 <!-- Query field -->
-
                 <v-select
                     v-if="!queryTemplate"
                     ref="query"
@@ -154,7 +147,6 @@ export default {
             queryTemplate: null,
             fragmentTemplate: null,
             loading: false,
-            // open: this.meta.initialOpen,
         }
 
     },
@@ -229,12 +221,10 @@ export default {
 
         toggleVisible() {
             return false;
-            // return this.linkValue;
         },
 
         fieldsVisible() {
             return this.linkValue;
-            // return this.linkValue && this.open;
         },
 
     },
@@ -265,7 +255,7 @@ export default {
             this.$nextTick(() => {
                 return this.fetchSpec();
             });
-        }, 300),
+        }, 500),
 
         queryChanged(query) {
             if (query === '__loading__') {
@@ -378,10 +368,6 @@ export default {
                      };
                 });
         },
-
-        // toggle() {
-        //     this.open = !this.open;
-        // },
 
     }
 

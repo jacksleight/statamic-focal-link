@@ -29,7 +29,7 @@ class ServiceProvider extends AddonServiceProvider
         $this->app->singleton(Utilities::class, function () {
             $presets = require_once __DIR__.'/../resources/data/presets.php';
 
-            return new Utilities(config('statamic.focal_link.links'), $presets);
+            return new Utilities(config('statamic.focal_link.types'), $presets);
         });
         $this->app->singleton(Scanner::class, function () {
             return new Scanner();

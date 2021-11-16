@@ -155,13 +155,6 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
 var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
@@ -173,8 +166,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       fragmentValue: this.meta.initialFragment,
       queryTemplate: null,
       fragmentTemplate: null,
-      loading: false // open: this.meta.initialOpen,
-
+      loading: false
     };
   },
   computed: {
@@ -245,10 +237,10 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       return !this.spec || this.spec.discovery && !this.spec.discovered;
     },
     toggleVisible: function toggleVisible() {
-      return false; // return this.linkValue;
+      return false;
     },
     fieldsVisible: function fieldsVisible() {
-      return this.linkValue; // return this.linkValue && this.open;
+      return this.linkValue;
     }
   },
   methods: {
@@ -280,7 +272,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       this.$nextTick(function () {
         return _this.fetchSpec();
       });
-    }, 300),
+    }, 500),
     queryChanged: function queryChanged(query) {
       if (query === '__loading__') {
         return;
@@ -413,10 +405,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
           loading: false
         };
       });
-    } // toggle() {
-    //     this.open = !this.open;
-    // },
-
+    }
   }
 });
 

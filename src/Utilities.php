@@ -9,9 +9,9 @@ class Utilities
 {
     protected $specs;
 
-    public function __construct($links, $presets)
+    public function __construct($types, $presets)
     {
-        $this->specs = collect($links)->union($presets)->reverse();
+        $this->specs = collect($types)->union($presets)->reverse();
     }
 
     public function getSpec($link)
