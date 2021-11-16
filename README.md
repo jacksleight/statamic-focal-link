@@ -98,7 +98,7 @@ Mutator::tag('heading', function ($tag, $data) {
 
 ## Popular Site Presets
 
-The addon comes with a handful of presets for popular sites. If you know of others and would like them added feel free to submit an issue or PR.
+The addon comes with a [handful of presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for popular sites. If you know of others and would like them added feel free to submit an issue or PR.
 
 ## Link Fieldtype Compatibility
 
@@ -110,6 +110,6 @@ Any Link field can be changed to a Focal Link field and the values will be compa
 
 ## Licencing
 
-Statamic Memberbox is not free software. You will need to purchase a license via the [Statamic Marketplace](https://statamic.com/addons/jacksleight/memberbox) to use it in production.
+Statamic Focal Link is not free software. You will need to purchase a license via the [Statamic Marketplace](https://statamic.com/addons/jacksleight/focal-link) to use it in production.
 
 <!-- /statamic:hide -->
