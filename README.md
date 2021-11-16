@@ -32,7 +32,7 @@ And then open `config/statamic/focal_link.php`.
 
 ## Getting Started
 
-Each key in the `types` list should be a pattern that matches a type of link. These can contain asterisks to perform wildcard matches. They should be in order of specificity (lowest to highest), the most specific match will be used.
+Each key in the `types` list should be a pattern that matches a type of link. These can contain asterisks to perform wildcard matches. They should be in order of specificity (lowest to highest), the most specific match wins.
 
 * Entry link types use the pattern: `entry::[collection]/[blueprint]`
 * URL link types use the pattern: `[protocol][host][port?][path]`
