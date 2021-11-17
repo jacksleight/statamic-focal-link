@@ -10,21 +10,16 @@ return [
 
     'types' => [
 
-        '*' => [
-            'fragments' => [],
-            'queries' => [],
-        ],
-
         'entry::*' => [
             'discovery' => [
-                '//*[@id]' => 'text()',
-                // '//*[@id]' => '@title',
-                // '//*[@id]' => '@data-label',
+                '//*[@id]' => 'text()',                   // Use text content for labels
+                // '//*[@id]' => '@title',                // Use title attribute for labels
+                // "//*[@id='content']//*[@id]" => '...', // Only search within #content element
             ],
             'fragments' => [
                 ':~:text={{ text }}' => 'Text Fragment',
             ],
-            'queries' => [],
+            // 'queries' => [],                           // Uncomment to enable query field
         ],
 
     ],
