@@ -79,7 +79,7 @@ The key should be the path to the elements containing the ID attribute, the valu
 ],
 ```
 
-Check out the included [examples](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/examples.php) and [template presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for more examples.
+Check out the [examples](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/examples.php) and [included template presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for more examples.
 
 ## Fieldtype Options
 
