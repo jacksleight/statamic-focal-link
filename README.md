@@ -10,7 +10,7 @@
 
 This Statamic addon provides foolproof fragment identifier linking via automatic ID discovery, templates with value encoding and predefined options. Also supports manual input and query strings.
 
-Automatic ID discovery works by scanning the destination page for fragment identifiers and allowing you to select one from a list. You can control exactly which IDs are discovered using XPath expressions. Templates prompt the user for a value and then automaticlly URL encode it.
+Automatic ID discovery works by scanning the destination page for fragment identifiers and allowing you to select one from a list. You can control exactly which IDs are discovered using XPath expressions. Templates prompt the user for a value and then automatically URL encodes it.
 
 ## Installation
 
