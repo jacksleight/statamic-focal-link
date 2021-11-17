@@ -155,6 +155,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
 var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
@@ -165,7 +167,9 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       queryValue: this.meta.initialQuery,
       fragmentValue: this.meta.initialFragment,
       queryTemplate: null,
+      queryTemplateAffix: null,
       fragmentTemplate: null,
+      fragmentTemplateAffix: null,
       loading: false
     };
   },
@@ -278,14 +282,17 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
         return;
       }
 
-      var prepared = this.prepareTemplate('query', query);
+      var template = this.prepareTemplate('query', query);
 
-      if (prepared) {
-        var _prepared = _slicedToArray(prepared, 2),
-            preparedValue = _prepared[0],
-            onNextTick = _prepared[1];
+      if (template) {
+        var _template = _slicedToArray(template, 4),
+            value = _template[0],
+            prefix = _template[1],
+            suffix = _template[2],
+            onNextTick = _template[3];
 
-        this.queryTemplate = preparedValue;
+        this.queryTemplate = value;
+        this.queryTemplateAffix = [prefix, suffix];
         this.$nextTick(onNextTick);
       } else {
         this.queryValue = query;
@@ -297,14 +304,17 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
         return;
       }
 
-      var prepared = this.prepareTemplate('fragment', fragment);
+      var template = this.prepareTemplate('fragment', fragment);
 
-      if (prepared) {
-        var _prepared2 = _slicedToArray(prepared, 2),
-            preparedValue = _prepared2[0],
-            onNextTick = _prepared2[1];
+      if (template) {
+        var _template2 = _slicedToArray(template, 4),
+            value = _template2[0],
+            prefix = _template2[1],
+            suffix = _template2[2],
+            onNextTick = _template2[3];
 
-        this.fragmentTemplate = preparedValue;
+        this.fragmentTemplate = value;
+        this.fragmentTemplateAffix = [prefix, suffix];
         this.$nextTick(onNextTick);
       } else {
         this.fragmentValue = fragment;
@@ -323,12 +333,14 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
         return;
       }
 
-      var parsed = value.substr(0, match.index) + match[1] + value.substr(match.index + match[0].length);
-      return [parsed, function () {
+      var placeholder = match[1];
+      var prefix = value.substr(0, match.index);
+      var suffix = value.substr(match.index + match[0].length);
+      return [placeholder, prefix, suffix, function () {
         var el = _this2.$refs["".concat(type, "_template")].$refs.input;
 
         el.focus();
-        el.setSelectionRange(match.index, match.index + match[1].length);
+        el.setSelectionRange(0, match[1].length);
       }];
     },
     queryTemplateCommit: function queryTemplateCommit() {
@@ -336,8 +348,15 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
         return;
       }
 
-      this.queryValue = this.queryTemplate;
+      var encoded = encodeURIComponent(this.queryTemplate);
+
+      var _this$queryTemplateAf = _slicedToArray(this.queryTemplateAffix, 2),
+          prefix = _this$queryTemplateAf[0],
+          suffix = _this$queryTemplateAf[1];
+
+      this.queryValue = "".concat(prefix).concat(encoded).concat(suffix);
       this.queryTemplate = null;
+      this.queryTemplateAffix = null;
       this.update(this.returnValue);
     },
     fragmentTemplateCommit: function fragmentTemplateCommit() {
@@ -345,8 +364,15 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
         return;
       }
 
-      this.fragmentValue = this.fragmentTemplate;
+      var encoded = encodeURIComponent(this.fragmentTemplate);
+
+      var _this$fragmentTemplat = _slicedToArray(this.fragmentTemplateAffix, 2),
+          prefix = _this$fragmentTemplat[0],
+          suffix = _this$fragmentTemplat[1];
+
+      this.fragmentValue = "".concat(prefix).concat(encoded).concat(suffix);
       this.fragmentTemplate = null;
+      this.fragmentTemplateAffix = null;
       this.update(this.returnValue);
     },
     selectOpen: function selectOpen() {
@@ -427,7 +453,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text {\n    padding-left: 20px !important;\n}\n.sfl-height {\n    height: 38px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text:first-child,\n.sfl-input .input-group-prepend {\n    padding-left: 20px !important;\n}\n.sfl-height {\n    height: 38px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1046,7 +1072,10 @@ var render = function () {
                     ? _c("text-input", {
                         ref: "query_template",
                         staticClass: "flex-1",
-                        attrs: { append: "⏎" },
+                        attrs: {
+                          prepend: _vm.queryTemplateAffix[0],
+                          append: _vm.queryTemplateAffix[1],
+                        },
                         on: {
                           keydown: function ($event) {
                             if (
@@ -1188,7 +1217,10 @@ var render = function () {
                     ? _c("text-input", {
                         ref: "fragment_template",
                         staticClass: "flex-1",
-                        attrs: { append: "⏎" },
+                        attrs: {
+                          prepend: _vm.fragmentTemplateAffix[0],
+                          append: _vm.fragmentTemplateAffix[1],
+                        },
                         on: {
                           keydown: function ($event) {
                             if (

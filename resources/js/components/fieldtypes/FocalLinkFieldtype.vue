@@ -61,7 +61,8 @@
                     ref="query_template"
                     class="flex-1"
                     v-model="queryTemplate"
-                    append="⏎"
+                    :prepend="queryTemplateAffix[0]"
+                    :append="queryTemplateAffix[1]"
                     @keydown.enter="queryTemplateCommit"
                     @blur="queryTemplateCommit"
                 />
@@ -108,7 +109,8 @@
                     ref="fragment_template"
                     class="flex-1"
                     v-model="fragmentTemplate"
-                    append="⏎"
+                    :prepend="fragmentTemplateAffix[0]"
+                    :append="fragmentTemplateAffix[1]"
                     @keydown.enter="fragmentTemplateCommit"
                     @blur="fragmentTemplateCommit"
                 />
@@ -145,7 +147,9 @@ export default {
             queryValue: this.meta.initialQuery,
             fragmentValue: this.meta.initialFragment,
             queryTemplate: null,
+            queryTemplateAffix: null,
             fragmentTemplate: null,
+            fragmentTemplateAffix: null,
             loading: false,
         }
 
@@ -261,10 +265,11 @@ export default {
             if (query === '__loading__') {
                 return;
             }
-            const prepared = this.prepareTemplate('query', query);
-            if (prepared) {
-                const [ preparedValue, onNextTick ] = prepared;
-                this.queryTemplate = preparedValue;
+            const template = this.prepareTemplate('query', query);
+            if (template) {
+                const [ value, prefix, suffix, onNextTick ] = template;
+                this.queryTemplate = value;
+                this.queryTemplateAffix = [prefix, suffix];
                 this.$nextTick(onNextTick);
             } else {
                 this.queryValue = query;
@@ -276,10 +281,11 @@ export default {
             if (fragment === '__loading__') {
                 return;
             }
-            const prepared = this.prepareTemplate('fragment', fragment);
-            if (prepared) {
-                const [ preparedValue, onNextTick ] = prepared;
-                this.fragmentTemplate = preparedValue;
+            const template = this.prepareTemplate('fragment', fragment);
+            if (template) {
+                const [ value, prefix, suffix, onNextTick ] = template;
+                this.fragmentTemplate = value;
+                this.fragmentTemplateAffix = [prefix, suffix];
                 this.$nextTick(onNextTick);
             } else {
                 this.fragmentValue = fragment;
@@ -296,14 +302,13 @@ export default {
             if (match === null) {
                 return;
             }
-            const parsed =
-                value.substr(0, match.index) +
-                match[1] +
-                value.substr(match.index + match[0].length);
-            return [ parsed, () => {
+            const placeholder = match[1];
+            const prefix = value.substr(0, match.index);
+            const suffix = value.substr(match.index + match[0].length);
+            return [ placeholder, prefix, suffix, () => {
                 const el = this.$refs[`${type}_template`].$refs.input;
                 el.focus();
-                el.setSelectionRange(match.index, match.index + match[1].length);
+                el.setSelectionRange(0, match[1].length);
             } ];
         },
 
@@ -311,8 +316,11 @@ export default {
             if (!this.queryTemplate) {
                 return;
             }
-            this.queryValue = this.queryTemplate;
+            const encoded = encodeURIComponent(this.queryTemplate);
+            const [ prefix, suffix ] = this.queryTemplateAffix;
+            this.queryValue = `${prefix}${encoded}${suffix}`;
             this.queryTemplate = null;
+            this.queryTemplateAffix = null;
             this.update(this.returnValue);
         },
 
@@ -320,8 +328,11 @@ export default {
             if (!this.fragmentTemplate) {
                 return;
             }
-            this.fragmentValue = this.fragmentTemplate;
+            const encoded = encodeURIComponent(this.fragmentTemplate);
+            const [ prefix, suffix ] = this.fragmentTemplateAffix;
+            this.fragmentValue = `${prefix}${encoded}${suffix}`;
             this.fragmentTemplate = null;
+            this.fragmentTemplateAffix = null;
             this.update(this.returnValue);
         },
 
@@ -386,7 +397,8 @@ export default {
     border: 1px solid transparent;
 }
 .sfl-input .vs__selected-options,
-.sfl-input .input-text {
+.sfl-input .input-text:first-child,
+.sfl-input .input-group-prepend {
     padding-left: 20px !important;
 }
 .sfl-height {
