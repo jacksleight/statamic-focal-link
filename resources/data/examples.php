@@ -2,8 +2,8 @@
 
 /**
  * These examples are not included by default, but you can copy them
- * into your config if you want to use them. Destination site changes
- * may invalidate the XPath expressions.
+ * into your config if you want to use them. Bear in mind that site
+ * design changes may invalidate these XPath expressions.
  */
 
 return [
