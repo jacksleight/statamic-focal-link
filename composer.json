@@ -7,8 +7,8 @@
     },
     "extra": {
         "statamic": {
-            "name": "Statamic Link Fragment Fieldtype",
-            "description": "This Statamic fieldtype streamlines linking to entry/URL fragment identifiers and query strings. It supports automatic ID discovery, predefined options, option templates and manual input."
+            "name": "Statamic Focal Link",
+            "description": "This Statamic addon provides foolproof fragment identifier linking via automatic ID discovery, common format templates and predefined options. It also supports manual input and query strings."
         },
         "laravel": {
             "providers": [
