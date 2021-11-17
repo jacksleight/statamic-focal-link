@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2021-11-17)
+
+- Updated presets and examples
+
 ## 0.2.0 (2021-11-17)
 
 - URL encode template values automatically

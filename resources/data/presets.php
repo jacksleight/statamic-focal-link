@@ -1,24 +1,10 @@
 <?php
 
+/**
+ * These template presets are included by default.
+ */
+
 return [
-
-    'http://github.com/*' => [
-        'discovery' => [
-            "//a[starts-with(@id, 'user-content-')]/@href" => 'following-sibling::text()',
-        ],
-    ],
-
-    'http://statamic.dev/*' => [
-        'discovery' => [
-            "//*[@id='content']//*[@id]" => 'text()',
-        ],
-    ],
-
-    'http://laravel.com/*' => [
-        'discovery' => [
-            "//*[@id='main-content']//*[@id]" => 'text()',
-        ],
-    ],
 
     'http://youtube.com/*' => [
         'fragments' => [

@@ -79,7 +79,7 @@ The key should be the path to the elements containing the ID attribute, the valu
 ],
 ```
 
-Check out the [included presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for more examples.
+Check out the included [examples](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/examples.php) and [template presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for more examples.
 
 ## Fieldtype Options
 
@@ -98,9 +98,9 @@ Mutator::tag('heading', function ($tag, $data) {
 });
 ```
 
-## Popular Site Presets
+## Popular Site Template Presets
 
-The addon comes with a [handful of presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for popular sites. If you know of others and would like them added feel free to submit an issue or PR.
+The addon comes with a [couple of template presets](https://github.com/jacksleight/statamic-focal-link/blob/main/resources/data/presets.php) for popular sites. If you know of others and would like them added feel free to submit an issue or PR.
 
 ## Link Fieldtype Compatibility
 
