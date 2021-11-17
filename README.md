@@ -106,9 +106,9 @@ The addon comes with a [couple of template presets](https://github.com/jacksleig
 
 ## Link Fieldtype Compatibility
 
-I’ve tried to make this fieldtype work as seamlessly as possible with the built-in Link fieldtype. Depending on the link this either stores values in an identical format or a suffixed format.
+This fieldtype tries to work as seamlessly as possible with the built-in Link fieldtype, by wrapping a Link field and then bolting on the additional features. Depending on the link this either stores values in an identical format or a suffixed format.
 
-Any Link field can be changed to a Focal Link field and the values will be compatible. If you change a Focal Link field back to a Link field Entry values with a query or fragment set will not be compatible, the suffixes will need to be removed.
+Any Link field can be changed to a Focal Link field and the values will be compatible. However if you change a Focal Link field back to a Link field Entry values with a query or fragment set will not be compatible, the suffixes will need to be removed.
 
 <!-- statamic:hide -->
 
