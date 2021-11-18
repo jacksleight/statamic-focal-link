@@ -2,6 +2,7 @@
 
 namespace JackSleight\StatamicFocalLink;
 
+use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Str;
 
@@ -71,8 +72,18 @@ class Utilities
             $id = Str::after($link, 'entry::');
             if ($includeType) {
                 $entry = Entry::find($id);
-                if ($entry && $entry->url()) {
+                if ($entry) {
                     $type = 'entry::'.$entry->collection()->handle().'/'.$entry->blueprint()->handle();
+                }
+            }
+        } elseif (Str::startsWith($value, 'asset::')) {
+            $option = 'asset';
+            $link = $before;
+            $id = Str::after($link, 'asset::');
+            if ($includeType) {
+                $asset = Asset::find($id);
+                if ($asset) {
+                    $type = 'asset::'.$asset->mimeType();
                 }
             }
         } elseif ($value !== '@child') {
@@ -85,7 +96,7 @@ class Utilities
 
         return [
             'value'    => $value,
-            'option'     => $option,
+            'option'   => $option,
             'type'     => $type,
             'link'     => $link,
             'query'    => $query,

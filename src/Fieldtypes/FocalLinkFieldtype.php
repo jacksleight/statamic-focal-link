@@ -2,7 +2,6 @@
 
 namespace JackSleight\StatamicFocalLink\Fieldtypes;
 
-use Facades\Statamic\Routing\ResolveRedirect;
 use JackSleight\StatamicFocalLink\Facades\Utilities;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -30,28 +29,30 @@ class FocalLinkFieldtype extends Fieldtype
 
     public function augment($value)
     {
-        if (! isset($value)) {
+        $link = Utilities::parseLink($value);
+
+        if (! isset($link['link'])) {
             return;
         }
 
-        $link = Utilities::parseLink($value);
+        $linkFieldtype = $this->nestedLinkFieldtype($link['link']);
 
-        $redirect = ResolveRedirect::resolve($link['link'], $this->field->parent());
+        $augmented = $linkFieldtype->augment($link['link']);
 
-        if ($redirect === 404) {
+        if (! isset($augmented)) {
             return null;
         }
 
-        if ($link['option'] === 'entry') {
+        if ($link['option'] !== 'url') {
             if (isset($link['query'])) {
-                $redirect .= "?{$link['query']}";
+                $augmented .= "?{$link['query']}";
             }
             if (isset($link['fragment'])) {
-                $redirect .= "#{$link['fragment']}";
+                $augmented .= "#{$link['fragment']}";
             }
         }
 
-        return $redirect;
+        return $augmented;
     }
 
     public function preload()

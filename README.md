@@ -8,9 +8,9 @@
 
 <!-- /statamic:hide -->
 
-This Statamic addon provides foolproof fragment identifier linking via automatic ID discovery, templates with value encoding and predefined options. Also supports manual input and query strings.
+This Statamic addon simplifies linking to URL hashes by automatically discovering IDs in the destination page and providing templates for common formats. Also supports fixed options, manual input and query strings.
 
-Automatic ID discovery works by scanning the destination page for fragment identifiers and allowing you to select one from a list. You can control exactly which IDs are discovered using XPath expressions. Templates prompt the user for a value and then automatically URL encodes it.
+Automatic discovery works by scanning the destination page for IDs and allowing you to select one from a list. You can control exactly which IDs are discovered using XPath expressions. Templates work by prompting the user for a value and then automatically URL encoding it.
 
 ## Installation
 
@@ -41,8 +41,8 @@ Each key in the `types` list should be a pattern that matches a type of link. Th
 
 Each type can contain the following settings:
 
-* **discovery:** A value/label array of XPath expressions used to find fragment identifiers in the destination page
-* **fragments:** A value/label array of fragment identifier options or templates
+* **discovery:** A value/label array of XPath expressions used to find IDs in the destination page
+* **fragments:** A value/label array of hash (fragment identifier) options or templates
 * **queries:** A value/label array of query string options or templates
 
 If **fragments** or **queries** are excluded those fields will not appear at all.
@@ -51,11 +51,11 @@ If **fragments** or **queries** are excluded those fields will not appear at all
 
 Options can either be a fixed value or a template value. Templates must contain the string `{{ [placeholder] }}`, this where the cursor will be placed when the template is selected.
 
-### Fragment Identifier Discovery
+### ID Discovery
 
 You can enable automatic ID discovery by setting the `discovery` option to an array of XPath expressions, these will be used to find matching elements in the destination page.
 
-The key should be the path to the elements containing the ID attribute, the value should be the path to the node that contains the label relative to the element. If the value is not set or the node cannot be found a label will be generated from the ID using `Str::headline()`.
+The key should be the path to the elements containing the ID attribute, the value should be the path to the node that contains the label, relative to the element. If the label expression is not set or the node cannot be found a label will be generated from the ID using `Str::headline()`.
 
 ### Example Link Type Settings
 

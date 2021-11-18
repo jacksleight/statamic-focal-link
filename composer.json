@@ -8,7 +8,7 @@
     "extra": {
         "statamic": {
             "name": "Statamic Focal Link",
-            "description": "This Statamic addon provides foolproof fragment identifier linking via automatic ID discovery, templates with value encoding and predefined options. Also supports manual input and query strings."
+            "description": "This Statamic addon simplifies linking to URL hashes by automatically discovering IDs in the destination page and providing templates for common formats. Also supports fixed options, manual input and query strings."
         },
         "laravel": {
             "providers": [
