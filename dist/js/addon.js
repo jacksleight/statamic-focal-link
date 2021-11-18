@@ -157,6 +157,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
 var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
@@ -945,12 +946,13 @@ var render = function () {
       "div",
       { staticClass: "space-x-1 flex items-center" },
       [
-        _c("link-fieldtype", {
+        _c(_vm.meta.nestedType + "-fieldtype", {
           ref: "link",
+          tag: "component",
           staticClass: "flex-1",
           attrs: {
             handle: "link",
-            value: "linkValue",
+            value: _vm.linkValue,
             config: _vm.meta.link.config,
             meta: _vm.meta.link.meta,
           },

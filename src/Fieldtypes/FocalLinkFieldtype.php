@@ -67,6 +67,7 @@ class FocalLinkFieldtype extends Fieldtype
             'initialLink' => $link['link'] ?? null,
             'initialQuery' => $link['query'] ?? null,
             'initialFragment' => $link['fragment'] ?? null,
+            'nestedType' => $this->config('nested_type', 'link'),
             'spec' => $spec,
             'link' => [
                 'config' => $linkFieldtype->config(),
@@ -78,7 +79,7 @@ class FocalLinkFieldtype extends Fieldtype
     protected function nestedLinkFieldtype($value): Fieldtype
     {
         $linkField = (new Field('link', [
-            'type' => 'link',
+            'type' => $this->config('nested_type', 'link'),
         ]));
 
         $linkField->setValue($value);

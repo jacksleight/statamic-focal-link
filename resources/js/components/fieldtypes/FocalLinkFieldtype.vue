@@ -4,11 +4,12 @@
         <div class="space-x-1 flex items-center">
 
             <!-- Link field -->
-            <link-fieldtype
+            <component
+                :is="`${meta.nestedType}-fieldtype`"
                 ref="link"
                 handle="link"
-                value="linkValue"
                 class="flex-1"
+                :value="linkValue"
                 :config="meta.link.config"
                 :meta="meta.link.meta"
                 @input="linkChanged"

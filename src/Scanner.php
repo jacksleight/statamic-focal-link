@@ -78,8 +78,8 @@ class Scanner
 
         $xpath = new DOMXPath($dom);
 
-        foreach ($spec['discovery'] as $targetQuery => $labelQuery) {
-            $nodes = $xpath->query($targetQuery);
+        foreach ($spec['discovery'] as $targetExpr => $labelExpr) {
+            $nodes = $xpath->query($targetExpr);
 
             foreach ($nodes as $node) {
                 $targetNode = $node instanceof DOMElement
@@ -99,8 +99,8 @@ class Scanner
                     continue;
                 }
 
-                if (is_string($labelQuery)) {
-                    $labelNodes = $xpath->query($labelQuery, $refNode);
+                if (is_string($labelExpr)) {
+                    $labelNodes = $xpath->query($labelExpr, $refNode);
                     if ($labelNodes->length) {
                         $labelNode = $labelNodes->item(0);
                         $labelText = Str::words(trim(preg_replace('/\s+/', ' ', $labelNode->textContent)), 12);
