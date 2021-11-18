@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 (2021-11-18)
+
+- Ability to configure nested field
+
 ## 0.2.1 (2021-11-17)
 
 - Updated presets and examples
