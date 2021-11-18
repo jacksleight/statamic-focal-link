@@ -33,7 +33,7 @@
                     v-if="!queryTemplate"
                     ref="query"
                     class="flex-1"
-                    placeholder="query"
+                    :placeholder="__('query')"
                     :value="queryValue"
                     :reduce="option => option.value"
                     :create-option="value => ({ value, label: value, title: null })"
@@ -50,7 +50,7 @@
                             <strong>{{ option.title }}</strong>
                         </div>
                         <div v-if="option.loading">
-                            <loading-graphic v-if="loading" :inline="true" text="Searching…" />
+                            <loading-graphic v-if="loading" :inline="true" :text="__('Searching…')" />
                         </div>
                     </template>
                     <template #no-options>
@@ -81,7 +81,7 @@
                     v-if="!fragmentTemplate"
                     ref="fragment"
                     class="flex-1"
-                    placeholder="fragment"
+                    :placeholder="__('fragment')"
                     :value="fragmentValue"
                     :reduce="option => option.value"
                     :create-option="value => ({ value, label: value, title: null })"
@@ -98,7 +98,7 @@
                             <strong>{{ option.title }}</strong>
                         </div>
                         <div v-if="option.loading">
-                            <loading-graphic v-if="loading" :inline="true" text="Searching…" />
+                            <loading-graphic v-if="loading" :inline="true" :text="__('Searching…')" />
                         </div>
                     </template>
                     <template #no-options>
@@ -122,7 +122,7 @@
                 v-if="!eitherEnabled"
                 class="flex-1 p-1 rounded border border-grey-40 bg-grey-10 flex justify-center items-center sfl-height">
 
-                <span class="text-sm text-grey" v-if="!loading">No additional options.</span>
+                <span class="text-sm text-grey" v-if="!loading" v-text="__('No additional options.')" />
                 <loading-graphic v-if="loading" :inline="true" text="Loading…" />
 
             </div>

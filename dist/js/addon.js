@@ -985,7 +985,7 @@ var render = function () {
                         ref: "query",
                         staticClass: "flex-1",
                         attrs: {
-                          placeholder: "query",
+                          placeholder: _vm.__("query"),
                           value: _vm.queryValue,
                           reduce: function (option) {
                             return option.value
@@ -1034,7 +1034,7 @@ var render = function () {
                                             ? _c("loading-graphic", {
                                                 attrs: {
                                                   inline: true,
-                                                  text: "Searching…",
+                                                  text: _vm.__("Searching…"),
                                                 },
                                               })
                                             : _vm._e(),
@@ -1065,7 +1065,7 @@ var render = function () {
                           ],
                           null,
                           false,
-                          52952055
+                          2809014806
                         ),
                       })
                     : _vm._e(),
@@ -1127,7 +1127,7 @@ var render = function () {
                         ref: "fragment",
                         staticClass: "flex-1",
                         attrs: {
-                          placeholder: "fragment",
+                          placeholder: _vm.__("fragment"),
                           value: _vm.fragmentValue,
                           reduce: function (option) {
                             return option.value
@@ -1179,7 +1179,7 @@ var render = function () {
                                             ? _c("loading-graphic", {
                                                 attrs: {
                                                   inline: true,
-                                                  text: "Searching…",
+                                                  text: _vm.__("Searching…"),
                                                 },
                                               })
                                             : _vm._e(),
@@ -1210,7 +1210,7 @@ var render = function () {
                           ],
                           null,
                           false,
-                          52952055
+                          2809014806
                         ),
                       })
                     : _vm._e(),
@@ -1267,9 +1267,12 @@ var render = function () {
                 },
                 [
                   !_vm.loading
-                    ? _c("span", { staticClass: "text-sm text-grey" }, [
-                        _vm._v("No additional options."),
-                      ])
+                    ? _c("span", {
+                        staticClass: "text-sm text-grey",
+                        domProps: {
+                          textContent: _vm._s(_vm.__("No additional options.")),
+                        },
+                      })
                     : _vm._e(),
                   _vm._v(" "),
                   _vm.loading
