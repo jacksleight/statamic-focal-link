@@ -8,7 +8,7 @@
 
 <!-- /statamic:hide -->
 
-This Statamic addon simplifies linking to URL hashes by automatically discovering IDs in the destination page and providing templates for common formats. Also supports fixed options, manual input and query strings.
+This Statamic addon simplifies linking to URL hashes (fragment identifiers) by automatically discovering IDs in the destination page and providing templates for common formats. Also supports fixed options, manual input and query strings.
 
 Automatic discovery works by scanning the destination page for IDs and allowing you to select one from a list. You can control exactly which IDs are discovered using XPath expressions. Templates work by prompting the user for a value and then automatically URL encoding it.
 
@@ -42,7 +42,7 @@ Each key in the `types` list should be a pattern that matches a type of link. Th
 Each type can contain the following settings:
 
 * **discovery:** A value/label array of XPath expressions used to find IDs in the destination page
-* **fragments:** A value/label array of hash (fragment identifier) options or templates
+* **fragments:** A value/label array of fragment identifier options or templates
 * **queries:** A value/label array of query string options or templates
 
 If **fragments** or **queries** are excluded those fields will not appear at all.
