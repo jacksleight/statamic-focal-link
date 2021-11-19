@@ -87,7 +87,8 @@ class FocalLinkFieldtype extends Fieldtype
 
         $linkField->setConfig(array_merge(
             $linkField->config(),
-            ['collections' => $this->config('collections')]
+            ['collections' => $this->config('collections')],
+            ['container' => $this->config('container')]
         ));
 
         return $linkField->fieldtype();
