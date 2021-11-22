@@ -2,9 +2,9 @@
 
 namespace JackSleight\StatamicFocalLink;
 
+use Statamic\Support\Str;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
-use Str;
 
 class Utilities
 {
