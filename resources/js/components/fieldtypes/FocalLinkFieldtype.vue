@@ -49,7 +49,7 @@
                             <span>{{ option.label }}</span>
                             <strong>{{ option.title }}</strong>
                         </div>
-                        <div v-if="option.loading">
+                        <div v-if="option.loading" class="sfl-loading">
                             <loading-graphic v-if="loading" :inline="true" :text="__('Searching…')" />
                         </div>
                     </template>
@@ -97,7 +97,7 @@
                             <span>{{ option.label }}</span>
                             <strong>{{ option.title }}</strong>
                         </div>
-                        <div v-if="option.loading">
+                        <div v-if="option.loading" class="sfl-loading">
                             <loading-graphic v-if="loading" :inline="true" :text="__('Searching…')" />
                         </div>
                     </template>
@@ -156,6 +156,15 @@ export default {
 
     },
 
+    created() {
+        Statamic.$hooks.on('entry.saved', (resolve, reject) => {
+            if (this.spec) {
+                this.spec.discovered = false;
+            }
+            resolve();
+        });
+    },
+
     computed: {
 
         returnValue() {
@@ -179,7 +188,7 @@ export default {
         queryOptions() {       
             const options = this.prepareOptions(this.spec.queries || {});
             if (this.loading) {
-                options.push({
+                options.unshift({
                     value: '__loading__',
                     label: null,
                     title: null,
@@ -193,7 +202,7 @@ export default {
         fragmentOptions() {  
             const options = this.prepareOptions(this.spec.fragments || {});
             if (this.loading) {
-                options.push({
+                options.unshift({
                     value: '__loading__',
                     label: null,
                     title: null,
@@ -404,5 +413,8 @@ export default {
 }
 .sfl-height {
     height: 38px;
+}
+.sfl-loading {
+    margin: -2px 0;
 }
 </style>

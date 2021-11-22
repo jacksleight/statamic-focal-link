@@ -174,6 +174,17 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       loading: false
     };
   },
+  created: function created() {
+    var _this = this;
+
+    Statamic.$hooks.on('entry.saved', function (resolve, reject) {
+      if (_this.spec) {
+        _this.spec.discovered = false;
+      }
+
+      resolve();
+    });
+  },
   computed: {
     returnValue: function returnValue() {
       if (!this.linkValue) {
@@ -200,7 +211,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       var options = this.prepareOptions(this.spec.queries || {});
 
       if (this.loading) {
-        options.push({
+        options.unshift({
           value: '__loading__',
           label: null,
           title: null,
@@ -215,7 +226,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       var options = this.prepareOptions(this.spec.fragments || {});
 
       if (this.loading) {
-        options.push({
+        options.unshift({
           value: '__loading__',
           label: null,
           title: null,
@@ -260,7 +271,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       this.linkChangedDebounced();
     },
     linkChangedDebounced: _.debounce(function () {
-      var _this = this;
+      var _this2 = this;
 
       if (this.linkValue) {
         var url = new URL(this.linkValue);
@@ -275,7 +286,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       }
 
       this.$nextTick(function () {
-        return _this.fetchSpec();
+        return _this2.fetchSpec();
       });
     }, 500),
     queryChanged: function queryChanged(query) {
@@ -326,7 +337,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       return templatePattern.exec(value) !== null;
     },
     prepareTemplate: function prepareTemplate(type, value) {
-      var _this2 = this;
+      var _this3 = this;
 
       var match = templatePattern.exec(value);
 
@@ -338,7 +349,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       var prefix = value.substr(0, match.index);
       var suffix = value.substr(match.index + match[0].length);
       return [placeholder, prefix, suffix, function () {
-        var el = _this2.$refs["".concat(type, "_template")].$refs.input;
+        var el = _this3.$refs["".concat(type, "_template")].$refs.input;
 
         el.focus();
         el.setSelectionRange(0, match[1].length);
@@ -382,7 +393,7 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
       }
     },
     fetchSpec: function fetchSpec() {
-      var _this3 = this;
+      var _this4 = this;
 
       var discover = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var _window$StatamicFocal = window.StatamicFocalLink,
@@ -407,21 +418,21 @@ var templatePattern = /\{\{\s*([a-z0-9]*)\s*\}\}/i;
           discover: discover
         }
       }).then(function (response) {
-        _this3.spec = response.data;
-        cache[value] = _this3.spec;
+        _this4.spec = response.data;
+        cache[value] = _this4.spec;
       })["catch"](function (e) {})["finally"](function (e) {
-        _this3.loading = false;
+        _this4.loading = false;
       });
     },
     prepareOptions: function prepareOptions(options) {
-      var _this4 = this;
+      var _this5 = this;
 
       return Object.entries(options).map(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             value = _ref2[0],
             label = _ref2[1];
 
-        if (_this4.isTemplate(value)) {
+        if (_this5.isTemplate(value)) {
           label = "".concat(label, "\u2026");
         }
 
@@ -454,7 +465,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text:first-child,\n.sfl-input .input-group-prepend {\n    padding-left: 20px !important;\n}\n.sfl-height {\n    height: 38px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sfl-input {\n    position: relative;\n}\n.sfl-input .sfl-prefix {\n    position: absolute;\n    top: 0;\n    left: 0;\n    padding: 8px 0 8px 8px;\n    border: 1px solid transparent;\n}\n.sfl-input .vs__selected-options,\n.sfl-input .input-text:first-child,\n.sfl-input .input-group-prepend {\n    padding-left: 20px !important;\n}\n.sfl-height {\n    height: 38px;\n}\n.sfl-loading {\n    margin: -2px 0;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1029,6 +1040,7 @@ var render = function () {
                                   option.loading
                                     ? _c(
                                         "div",
+                                        { staticClass: "sfl-loading" },
                                         [
                                           _vm.loading
                                             ? _c("loading-graphic", {
@@ -1065,7 +1077,7 @@ var render = function () {
                           ],
                           null,
                           false,
-                          2809014806
+                          334456034
                         ),
                       })
                     : _vm._e(),
@@ -1174,6 +1186,7 @@ var render = function () {
                                   option.loading
                                     ? _c(
                                         "div",
+                                        { staticClass: "sfl-loading" },
                                         [
                                           _vm.loading
                                             ? _c("loading-graphic", {
@@ -1210,7 +1223,7 @@ var render = function () {
                           ],
                           null,
                           false,
-                          2809014806
+                          334456034
                         ),
                       })
                     : _vm._e(),
@@ -1490,6 +1503,10 @@ window.StatamicFocalLink = {
 };
 Statamic.booting(function () {
   Statamic.$components.register('focal_link-fieldtype', _components_Fieldtypes_FocalLinkFieldtype_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
+  Statamic.$hooks.on('entry.saved', function (resolve, reject) {
+    window.StatamicFocalLink.discoverCache = {};
+    resolve();
+  });
 });
 })();
 
