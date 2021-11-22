@@ -15,6 +15,7 @@ class Scanner
 {
     protected $ignoreTags = [
         'script',
+        'svg',
     ];
 
     public function scan($link, $spec)
@@ -95,9 +96,12 @@ class Scanner
                     ? $node->parentNode
                     : $node;
 
-                if ($refNode instanceof DOMElement && in_array($refNode->tagName, $this->ignoreTags)) {
-                    continue;
-                }
+                $pointerNode = $refNode;
+                do {
+                    if ($pointerNode instanceof DOMElement && in_array($pointerNode->tagName, $this->ignoreTags)) {
+                        continue 2;
+                    }
+                } while ($pointerNode = $pointerNode->parentNode);
 
                 if (is_string($labelExpr)) {
                     $labelNodes = $xpath->query($labelExpr, $refNode);
