@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3 (2021-11-18)
+
+- [new] Clear the client side discovery cache when an entry is saved
+- [new] Ignore svg tags and all children
+- [fix] Use full class names instead of alises
+
 ## 0.2.2 (2021-11-18)
 
 - Parse all UI strings through translate function
