@@ -1,10 +1,10 @@
 # Changelog
 
-## 0.2.3 (2021-11-18)
+## 0.2.3 (2021-11-22)
 
-- [new] Clear the client side discovery cache when an entry is saved
-- [new] Ignore svg tags and all children
-- [fix] Use full class names instead of alises
+- [fix] Use full class names instead of aliases
+- Clear the client side discovery cache when an entry is saved
+- Ignore svg tags and all children
 
 ## 0.2.2 (2021-11-18)
 
