@@ -18,5 +18,11 @@
     },
     "require": {
         "statamic/cms": "^3.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "pixelfear/composer-dist-plugin": true
+        }
     }
 }
