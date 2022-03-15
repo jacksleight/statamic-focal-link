@@ -19,7 +19,7 @@ return [
         ],
     ],
 
-    'asset::application/pdf' => [
+    'asset::*/application/pdf' => [
         'fragments' => [
             'page={{ 5 }}' => 'Page',
         ],

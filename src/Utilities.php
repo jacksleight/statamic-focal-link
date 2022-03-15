@@ -83,7 +83,7 @@ class Utilities
             if ($includeType) {
                 $asset = Asset::find($id);
                 if ($asset) {
-                    $type = 'asset::'.$asset->mimeType();
+                    $type = 'asset::'.$asset->container()->handle().'/'.$asset->mimeType();
                 }
             }
         } elseif ($value !== '@child') {
