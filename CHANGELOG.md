@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 (2022-03-15)
+
+- [new] Add container option to enable linking to assets (3.2.38+)
+- [new] Add preset for linking to specific pages of PDF documents
+
 ## 0.2.3 (2021-11-22)
 
 - [fix] Use full class names instead of aliases
