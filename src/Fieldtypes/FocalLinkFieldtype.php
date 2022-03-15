@@ -24,6 +24,13 @@ class FocalLinkFieldtype extends Fieldtype
                 'type' => 'collections',
                 'mode' => 'select',
             ],
+            'container' => [
+                'display' => __('Container'),
+                'instructions' => __('statamic::fieldtypes.link.config.container'),
+                'type' => 'asset_container',
+                'mode' => 'select',
+                'max_items' => 1,
+            ],
         ];
     }
 
