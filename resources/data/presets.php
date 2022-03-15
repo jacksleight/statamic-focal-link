@@ -19,4 +19,10 @@ return [
         ],
     ],
 
+    'asset::application/pdf' => [
+        'fragments' => [
+            'page={{ 5 }}' => 'Page',
+        ],
+    ],
+
 ];
