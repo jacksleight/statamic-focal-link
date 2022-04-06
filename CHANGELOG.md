@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 (2022-03-15)
+## 0.3.0 ()
 
 - [new] Add container option to enable linking to assets (3.2.38+)
 - [new] Add preset for linking to specific pages of PDF documents
