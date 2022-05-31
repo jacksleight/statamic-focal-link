@@ -13,8 +13,6 @@ class Utilities
     public function __construct($types, $presets)
     {
         $this->specs = collect($types)->union($presets)->reverse();
-
-        dd($this->specs);
     }
 
     public function getSpec($link)
@@ -75,7 +73,7 @@ class Utilities
             if ($includeType) {
                 $entry = Entry::find($id);
                 if ($entry) {
-                    $type = 'entry::'.$entry->collection()->handle().'/'.$entry->blueprint()->handle();
+                    $type = 'entry::'.$entry->collection()->handle().'::'.$entry->blueprint()->handle();
                 }
             }
         } elseif (Str::startsWith($value, 'asset::')) {
@@ -85,7 +83,7 @@ class Utilities
             if ($includeType) {
                 $asset = Asset::find($id);
                 if ($asset) {
-                    $type = 'asset::'.$asset->container()->handle().'/'.$asset->mimeType();
+                    $type = 'asset::'.$asset->container()->handle().'::'.$asset->mimeType();
                 }
             }
         } elseif ($value !== '@child') {
@@ -109,6 +107,9 @@ class Utilities
 
     public function normalizeUrl($url)
     {
+        if (Str::startsWith($url, 'entry::')) {
+            $url = Str::replaceFirst('/', '::', $url);
+        }
         if (Str::startsWith($url, 'https://')) {
             $url = 'http://'.Str::after($url, 'https://');
         }

@@ -36,8 +36,8 @@ Each key in the `types` list should be a pattern that matches a type of link. Th
 * URL link types use the pattern: `[protocol][host][port?][path]`
     * Basically the full URL up to the end of the path
     * `http(s)` and `www` will be normalized automatically
-* Entry link types use the pattern: `entry::[collection]/[blueprint]`
-* Asset link types use the pattern: `asset::[container]/[mime-type]`
+* Entry link types use the pattern: `entry::[collection]::[blueprint]`
+* Asset link types use the pattern: `asset::[container]::[mime-type]`
 
 Each type can contain the following settings:
 
