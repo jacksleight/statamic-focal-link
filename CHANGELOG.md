@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.3.0 ()
+## 1.0.0 (2022-05-31)
 
-- [new] Add container option to enable linking to assets (3.2.38+)
+- [new] Add container option to enable linking to assets
 - [new] Add preset for linking to specific pages of PDF documents
+- The `entry::collection/blueprint` pattern is now deprecated, use `entry::collection::blueprint` instead
 
 ## 0.2.3 (2021-11-22)
 

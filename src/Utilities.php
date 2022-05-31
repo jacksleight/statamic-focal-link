@@ -107,6 +107,7 @@ class Utilities
 
     public function normalizeUrl($url)
     {
+        // @deprecated old entry format
         if (Str::startsWith($url, 'entry::')) {
             $url = Str::replaceFirst('/', '::', $url);
         }
