@@ -13,6 +13,8 @@ class Utilities
     public function __construct($types, $presets)
     {
         $this->specs = collect($types)->union($presets)->reverse();
+
+        dd($this->specs);
     }
 
     public function getSpec($link)

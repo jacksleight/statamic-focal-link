@@ -7,8 +7,8 @@ use DOMDocument;
 use DOMElement;
 use DOMXPath;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Statamic\Facades\Entry;
-use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class Scanner
