@@ -60,7 +60,7 @@ The key should be the path to the elements containing the ID attribute, the valu
 ### Example Link Type Settings
 
 ```php
-'entry::products/*' => [ // All entries within the products collection
+'entry::products::*' => [ // All entries within the products collection
 
     'discovery' => [
         "//*[@id]" => "text()", // Elements with an ID attribute, with the text content as a label
