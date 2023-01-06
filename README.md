@@ -116,4 +116,8 @@ Any Link field can be changed to a Focal Link field and the values will be compa
 
 Statamic Focal Link is not free software. You will need to purchase a license via the [Statamic Marketplace](https://statamic.com/addons/jacksleight/focal-link) to use it in production.
 
+## Contributing
+
+All contributions are very welcome and appreciated! However, plese bear in mind that while Memberbox's source code is open source and publicly available, it is proprietary. Everything in this repo, including any community-contributed code, is the property of Jack Sleight.
+
 <!-- /statamic:hide -->
