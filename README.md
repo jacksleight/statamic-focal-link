@@ -118,6 +118,6 @@ Statamic Focal Link is not free software. You will need to purchase a license vi
 
 ## Contributing
 
-All contributions are very welcome and appreciated! However, plese bear in mind that while Memberbox's source code is open source and publicly available, it is proprietary. Everything in this repo, including any community-contributed code, is the property of Jack Sleight.
+All contributions are very welcome and appreciated! However, plese bear in mind that while Focal Link's source code is open source and publicly available, it is proprietary. Everything in this repo, including any community-contributed code, is the property of Jack Sleight.
 
 <!-- /statamic:hide -->
