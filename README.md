@@ -3,7 +3,7 @@
 ![Statamic](https://flat.badgen.net/badge/Statamic/3.2+/FF269E)
 ![Packagist version](https://flat.badgen.net/packagist/v/jacksleight/statamic-focal-link)
 
-# Statamic Focal Link Fieldtype
+# Focal Link Fieldtype
 
 <!-- /statamic:hide -->
 
