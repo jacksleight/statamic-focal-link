@@ -3,7 +3,10 @@ module.exports = {
         require('postcss-nested'),
         require('postcss-preset-env'),
         require('@fullhuman/postcss-purgecss')({
-            content: ['./resources/**/*.{html,js,vue,blade.php}']
+            content: ['./resources/**/*.{html,js,vue,blade.php}'],
+            safelist: {
+                greedy: [/^fcl-/],
+            },
         }),
     ],
 };
