@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 ()
+
+- [new] Statamic 4 support
+
 ## 1.0.0 (2022-05-31)
 
 - [new] Add container option to enable linking to assets
