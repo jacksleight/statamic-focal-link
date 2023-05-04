@@ -2,9 +2,9 @@
 
 namespace JackSleight\StatamicFocalLink;
 
-use Statamic\Support\Str;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
+use Statamic\Support\Str;
 
 class Utilities
 {
@@ -22,9 +22,9 @@ class Utilities
         }
 
         $spec = [
-            'queries'    => null,
-            'fragments'  => null,
-            'discovery'  => null,
+            'queries' => null,
+            'fragments' => null,
+            'discovery' => null,
             'discovered' => false,
         ];
 
@@ -95,22 +95,18 @@ class Utilities
         }
 
         return [
-            'value'    => $value,
-            'option'   => $option,
-            'type'     => $type,
-            'link'     => $link,
-            'query'    => $query,
+            'value' => $value,
+            'option' => $option,
+            'type' => $type,
+            'link' => $link,
+            'query' => $query,
             'fragment' => $fragment,
-            'id'       => $id,
+            'id' => $id,
         ];
     }
 
     public function normalizeUrl($url)
     {
-        // @deprecated old entry format
-        if (Str::startsWith($url, 'entry::')) {
-            $url = Str::replaceFirst('/', '::', $url);
-        }
         if (Str::startsWith($url, 'https://')) {
             $url = 'http://'.Str::after($url, 'https://');
         }

@@ -1,3 +1,5 @@
+import '../css/addon.css';
+
 import FocalLinkFieldtype from './components/Fieldtypes/FocalLinkFieldtype.vue';
 
 window.StatamicFocalLink = {

@@ -18,15 +18,15 @@
 
         </div>
 
-        <div class="mt-1 space-x-1 flex items-center" v-if="fieldsVisible">
+        <div class="mt-2 flex items-center" v-if="fieldsVisible">
         
-            <div class="w-40 mr-1 flex-shrink-0 text-right"></div>
+            <div class="w-40 mr-4 flex-shrink-0 text-right"></div>
 
             <div
                 v-if="queryEnabled"
-                class="sfl-input flex-1 flex items-center">
+                class="fcl-input flex-1 flex items-center">
 
-                <div class="sfl-prefix text-grey-60">?</div>
+                <div class="fcl-prefix text-grey-60">?</div>
 
                 <!-- Query field -->
                 <v-select
@@ -49,12 +49,12 @@
                             <span>{{ option.label }}</span>
                             <strong>{{ option.title }}</strong>
                         </div>
-                        <div v-if="option.loading" class="sfl-loading">
+                        <div v-if="option.loading" class="fcl-loading">
                             <loading-graphic v-if="loading" :inline="true" :text="__('Searching…')" />
                         </div>
                     </template>
                     <template #no-options>
-                        <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                        <div class="text-sm text-grey-70 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                     </template>
                 </v-select>
                 <text-input
@@ -72,9 +72,9 @@
 
             <div
                 v-if="fragmentEnabled"
-                class="sfl-input flex-1 flex items-center">
+                class="fcl-input flex-1 flex items-center">
 
-                <div class="sfl-prefix text-grey-60">#</div>
+                <div class="fcl-prefix text-grey-60">#</div>
 
                 <!-- Fragment field -->
                 <v-select
@@ -97,12 +97,12 @@
                             <span>{{ option.label }}</span>
                             <strong>{{ option.title }}</strong>
                         </div>
-                        <div v-if="option.loading" class="sfl-loading">
+                        <div v-if="option.loading" class="fcl-loading">
                             <loading-graphic v-if="loading" :inline="true" :text="__('Searching…')" />
                         </div>
                     </template>
                     <template #no-options>
-                        <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                        <div class="text-sm text-grey-70 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                     </template>
                 </v-select>
                 <text-input
@@ -120,7 +120,7 @@
 
             <div
                 v-if="!eitherEnabled"
-                class="flex-1 p-1 rounded border border-grey-40 bg-grey-10 flex justify-center items-center sfl-height">
+                class="flex-1 p-2 rounded border border-grey-40 bg-grey-10 flex justify-center items-center fcl-height">
 
                 <span class="text-sm text-grey" v-if="!loading" v-text="__('No additional options.')" />
                 <loading-graphic v-if="loading" :inline="true" text="Loading…" />
@@ -394,27 +394,3 @@ export default {
 
 }
 </script>
-
-<style>
-.sfl-input {
-    position: relative;
-}
-.sfl-input .sfl-prefix {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 8px 0 8px 8px;
-    border: 1px solid transparent;
-}
-.sfl-input .vs__selected-options,
-.sfl-input .input-text:first-child,
-.sfl-input .input-group-prepend {
-    padding-left: 20px !important;
-}
-.sfl-height {
-    height: 38px;
-}
-.sfl-loading {
-    margin: -2px 0;
-}
-</style>
