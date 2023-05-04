@@ -3,6 +3,7 @@
 ## 2.0.0 (2023-05-04)
 
 - [new] Statamic 4 support
+- [break] Support for the previously deprecated `entry::collection/blueprint` pattern has been removed
 - Droppped support for Statamic 3
 
 ## 1.0.0 (2022-05-31)

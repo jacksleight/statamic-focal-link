@@ -107,10 +107,6 @@ class Utilities
 
     public function normalizeUrl($url)
     {
-        // @deprecated old entry format
-        if (Str::startsWith($url, 'entry::')) {
-            $url = Str::replaceFirst('/', '::', $url);
-        }
         if (Str::startsWith($url, 'https://')) {
             $url = 'http://'.Str::after($url, 'https://');
         }
