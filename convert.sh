@@ -6,7 +6,7 @@
 replaceClass() {
   local before="$1-$2"
   local beforeEscaped="${1//-/\-}-${2//./\.}"
-  local after="jstw-$1-$3"
+  local after="$1-$3"
   rg -g '*.{html,php,vue,css,scss}' -l "$beforeEscaped" | xargs sed -i '' "s/\([^.a-zA-Z0-9_-]\)${beforeEscaped}\([^.a-zA-Z0-9_-]\)/\1${after}___REPLACED\2/g"
 }
 

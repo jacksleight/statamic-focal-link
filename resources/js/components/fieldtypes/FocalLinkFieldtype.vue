@@ -18,9 +18,9 @@
 
         </div>
 
-        <div class="jstw-mt-2 flex items-center" v-if="fieldsVisible">
+        <div class="mt-2 flex items-center" v-if="fieldsVisible">
         
-            <div class="w-40 jstw-mr-4 flex-shrink-0 text-right"></div>
+            <div class="w-40 mr-4 flex-shrink-0 text-right"></div>
 
             <div
                 v-if="queryEnabled"
@@ -54,7 +54,7 @@
                         </div>
                     </template>
                     <template #no-options>
-                        <div class="text-sm text-grey-70 text-left jstw-py-2 jstw-px-4" v-text="__('No options to choose from.')" />
+                        <div class="text-sm text-grey-70 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                     </template>
                 </v-select>
                 <text-input
@@ -102,7 +102,7 @@
                         </div>
                     </template>
                     <template #no-options>
-                        <div class="text-sm text-grey-70 text-left jstw-py-2 jstw-px-4" v-text="__('No options to choose from.')" />
+                        <div class="text-sm text-grey-70 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                     </template>
                 </v-select>
                 <text-input
@@ -120,7 +120,7 @@
 
             <div
                 v-if="!eitherEnabled"
-                class="flex-1 jstw-p-2 rounded border border-grey-40 bg-grey-10 flex justify-center items-center fcl-height">
+                class="flex-1 p-2 rounded border border-grey-40 bg-grey-10 flex justify-center items-center fcl-height">
 
                 <span class="text-sm text-grey" v-if="!loading" v-text="__('No additional options.')" />
                 <loading-graphic v-if="loading" :inline="true" text="Loading…" />

@@ -1,9 +1,9 @@
 # Changelog
 
-## 1.1.0 ()
+## 2.0.0 (2023-05-04)
 
 - [new] Statamic 4 support
-- Minimum supported Statamic version is now 3.3.66
+- Droppped support for Statamic 3
 
 ## 1.0.0 (2022-05-31)
 
