@@ -20,7 +20,7 @@
 
         <div class="mt-2 flex items-center" v-if="fieldsVisible">
         
-            <div class="w-40 mr-4 flex-shrink-0 text-right"></div>
+            <div class="w-28 mr-4 flex-shrink-0 text-right"></div>
 
             <div
                 v-if="queryEnabled"
