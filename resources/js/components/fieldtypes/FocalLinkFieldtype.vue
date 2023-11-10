@@ -33,6 +33,7 @@
                     v-if="!queryTemplate"
                     ref="query"
                     class="flex-1"
+                    append-to-body
                     :placeholder="__('query')"
                     :value="queryValue"
                     :reduce="option => option.value"
@@ -81,6 +82,7 @@
                     v-if="!fragmentTemplate"
                     ref="fragment"
                     class="flex-1"
+                    append-to-body
                     :placeholder="__('fragment')"
                     :value="fragmentValue"
                     :reduce="option => option.value"

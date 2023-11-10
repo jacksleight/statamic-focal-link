@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 (2023-11-10)
+
+- [fix] Dropdown z-index issue
+
 ## 2.0.0 (2023-05-04)
 
 - [new] Statamic 4 support
