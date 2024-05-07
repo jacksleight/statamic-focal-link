@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2 (2024-05-07)
+
+- Statamic 5 support
+
 ## 2.0.1 (2023-11-10)
 
 - [fix] Dropdown z-index issue
